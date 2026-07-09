@@ -1,4 +1,5 @@
-"use client";
+import { useRouter } from 'expo-router';
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList, tyleSheet, Modal } from "react-native";
 import { useState, useEffect } from "react";
 import {
   Button, Typography, Divider, TextField, FormControl,
@@ -6,20 +7,25 @@ import {
   Paper, IconButton, Box, Checkbox, FormControlLabel,
   Card, CardContent, Alert, Dialog, DialogTitle, DialogContent,
   DialogActions, Chip, List, ListItem, ListItemIcon, ListItemText,
-} from "@mui/material";
+} from "react-native-paper";
 
-import { Close, Search } from "@mui/icons-material";
+import { 
+  X as Close, 
+  Search 
+} from 'lucide-react-native';
 
 import {
-  Delete as DeleteIcon, Add as AddIcon, Edit as EditIcon,
-  ContentCopy,
-} from "@mui/icons-material";
+  Trash2 as DeleteIcon, 
+  Plus as AddIcon, 
+  Pencil as EditIcon,
+  Copy as ContentCopy,
+} from 'lucide-react-native';
 import { useDispatch } from "react-redux";
 import {
   addRooms, deleteRoom, updateRoom, uploadRoomMedia, updateRoomMediaItem
 } from "@/redux/features/property/propertySlice";
 import RoomsAmenities from "./RoomsAmenities";
-import toast from "react-hot-toast";
+import {toast} from "@backpackapp-io/react-native-toast";
 import { useConfirm } from "@/hooks/useConfirm";
 
 import ResponsiveTextField from "../ResponsiveTextField";
@@ -273,7 +279,7 @@ export default function RoomsForm({
   const handleSaveTagAndNext = () => {
     const currentItem = pendingFiles[tagDialogIndex];
     if (!currentItem?.tags?.length) {
-      toast.error('Please select at least one tag.');
+      Toast.error('Please select at least one tag.');
       return;
     }
     if (tagDialogQueue.length > 0) {
@@ -290,17 +296,17 @@ export default function RoomsForm({
 
   const handleAddRoom = async () => {
     if (!validateRoomData()) {
-      toast.error("Please fill in all required fields.");
+      Toast.error("Please fill in all required fields.");
       return;
     }
     if (pendingFiles.length === 0) {
-      toast.error("Please select at least one photo for this room.");
+      Toast.error("Please select at least one photo for this room.");
       return;
     }
     // Check all files are tagged
     const untagged = pendingFiles.filter(f => !f.tags || f.tags.length === 0);
     if (untagged.length > 0) {
-      toast.error(`${untagged.length} photo(s) still need tags. Click on them to add tags.`);
+      Toast.error(`${untagged.length} photo(s) still need tags. Click on them to add tags.`);
       return;
     }
 
@@ -349,12 +355,12 @@ export default function RoomsForm({
         setLocalRooms(updatedRooms);
         onAddRoom(updatedRooms);
         setPendingFiles([]);
-        toast.success("Room saved with photos and tags!");
+        Toast.success("Room saved with photos and tags!");
         handleCancelForm();
       }
     } catch (error) {
       console.error("Failed to add room:", error);
-      toast.error("Failed to create room. Please try again.");
+      Toast.error("Failed to create room. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -365,7 +371,7 @@ export default function RoomsForm({
     // Check all pending files are tagged
     const untagged = pendingFiles.filter(f => !f.tags || f.tags.length === 0);
     if (untagged.length > 0) {
-      toast.error(`${untagged.length} photo(s) still need tags. Click on them to add tags.`);
+      Toast.error(`${untagged.length} photo(s) still need tags. Click on them to add tags.`);
       return;
     }
     setIsSubmitting(true);
@@ -412,11 +418,11 @@ export default function RoomsForm({
       onAddRoom(updatedRooms);
       setCurrentRoomData(finalRoomData);
       
-      toast.success("Room updated successfully.");
+      Toast.success("Room updated successfully.");
       handleCancelForm();
     } catch (error) {
       console.error("Failed to update room:", error);
-      toast.error("Failed to update room.");
+      Toast.error("Failed to update room.");
     } finally {
       setIsSubmitting(false);
     }
@@ -493,7 +499,7 @@ export default function RoomsForm({
   // Main render logic
   if (isAddingRoom) {
     return (
-      <Paper className="p-4 mb-4">
+      <Paper style={styles.container}>
         <ConfirmDialog />
         <Typography variant="h6" gutterBottom>
           {isEditingRoom ? "Edit Room" : "Add New Room"}
@@ -505,21 +511,21 @@ export default function RoomsForm({
         <Grid container spacing={3}>
           {/* Room Name */}
           <Grid item size={{ xs: 12, md: 3 }}>
-            <ResponsiveTextField name="roomName" fullWidth label="Room Name *" value={currentRoomData.roomName} onChange={(e) => handleRoomChange("roomName", e.target.value)} error={!!formErrors.roomName} helperText={formErrors.roomName} sx={{ "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": { borderColor: "#2e2e2e" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#1976d2" } }} />
+            <ResponsiveTextField name="roomName" fullWidth label="Room Name *" value={currentRoomData.roomName} onChangeText={(e) => handleRoomChange("roomName", e.target.value)} error={!!formErrors.roomName} helperText={formErrors.roomName} sx={{ "& .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline": { borderColor: "#2e2e2e" }, "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#1976d2" } }} />
             
           </Grid>
 
           {/* Description */}
           <Grid item size={{ xs: 12, md: 3 }}>
-            <ResponsiveTextField fullWidth label="Description" multiline  value={currentRoomData.description} onChange={(e) => handleRoomChange("description", e.target.value)} />
+            <ResponsiveTextField fullWidth label="Description" multiline  value={currentRoomData.description} onChangeText={(e) => handleRoomChange("description", e.target.value)} />
           </Grid>
                 <Grid item size={{ xs: 12, md: 3 }}>
-                <ResponsiveTextField name="roomSize" fullWidth label="Room Size *" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.roomSize} onChange={(e) => handleRoomChange("roomSize", e.target.value)} error={!!formErrors.roomSize} helperText={formErrors.roomSize} />
+                <ResponsiveTextField name="roomSize" fullWidth label="Room Size *" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.roomSize} onChangeText={(e) => handleRoomChange("roomSize", e.target.value)} error={!!formErrors.roomSize} helperText={formErrors.roomSize} />
               </Grid>
               <Grid item size={{ xs: 12, md: 3 }}>
                 <ResponsiveFormControl fullWidth  >
                   <InputLabel>Unit</InputLabel>
-                  <Select value={currentRoomData.sizeUnit} onChange={(e) => handleRoomChange("sizeUnit", e.target.value)} label="Unit">
+                  <Select value={currentRoomData.sizeUnit} onChangeText={(e) => handleRoomChange("sizeUnit", e.target.value)} label="Unit">
                     <MenuItem value="sqft">sq ft</MenuItem>
                     <MenuItem value="sqm">sq m</MenuItem>
                   </Select>
@@ -531,49 +537,49 @@ export default function RoomsForm({
           <Grid item size={{ xs: 12, md: 6 }}>
             <Typography sx={{ mb: "21px" }} variant="subtitle1" gutterBottom>Bed Configuration *</Typography>
             {currentRoomData.beds.map((bed, index) => (
-              <Grid container spacing={2} key={index} className="mb-3 items-end">
+              <Grid container spacing={2} key={index} style={styles.container}>
                 <Grid item size={{ xs: 12, md: 5 }}>
                   <ResponsiveFormControl  fullWidth error={!!formErrors.beds?.[index]?.bedType}>
                     <InputLabel>Bed Type *</InputLabel>
-                    <Select name="beds" value={bed.bedType} onChange={(e) => handleBedChange(index, "bedType", e.target.value)} label="Bed Type *">
+                    <Select name="beds" value={bed.bedType} onChangeText={(e) => handleBedChange(index, "bedType", e.target.value)} label="Bed Type *">
                       {bedTypes.map((type) => <MenuItem key={type} value={type}>{type}</MenuItem>)}
                     </Select>
                     {formErrors.beds?.[index]?.bedType && <FormHelperText>{formErrors.beds[index].bedType}</FormHelperText>}
                   </ResponsiveFormControl>
                 </Grid>
                 <Grid item size={{ xs: 12, md: 3 }}>
-                  <ResponsiveTextField fullWidth label="Number of Beds *" type="number"  value={bed.count} onChange={(e) => handleBedChange(index, "count", parseInt(e.target.value))} error={!!formErrors.beds?.[index]?.count} helperText={formErrors.beds?.[index]?.count} InputProps={{ inputProps: { min: 1 }, onWheel: (e) => e.target.blur(), }} />
+                  <ResponsiveTextField fullWidth label="Number of Beds *" type="number"  value={bed.count} onChangeText={(e) => handleBedChange(index, "count", parseInt(e.target.value))} error={!!formErrors.beds?.[index]?.count} helperText={formErrors.beds?.[index]?.count} InputProps={{ inputProps: { min: 1 }, onWheel: (e) => e.target.blur(), }} />
                 </Grid>
                 <Grid item size={{ xs: 12, md: 3 }}>
-                  <ResponsiveTextField fullWidth label="People per Bed *" type="number"  value={bed.accommodates} onChange={(e) => handleBedChange(index, "accommodates", parseInt(e.target.value))} error={!!formErrors.beds?.[index]?.accommodates} helperText={formErrors.beds?.[index]?.accommodates} InputProps={{ inputProps: { min: 1 }, onWheel: (e) => e.target.blur(), }} />
+                  <ResponsiveTextField fullWidth label="People per Bed *" type="number"  value={bed.accommodates} onChangeText={(e) => handleBedChange(index, "accommodates", parseInt(e.target.value))} error={!!formErrors.beds?.[index]?.accommodates} helperText={formErrors.beds?.[index]?.accommodates} InputProps={{ inputProps: { min: 1 }, onWheel: (e) => e.target.blur(), }} />
                 </Grid>
-                {currentRoomData.beds.length > 1 && (<Grid item size={{ xs: 12, md: 1 }} sm={2} className="flex justify-end">
-                  <IconButton color="error" onClick={() => removeBed(index)} disabled={currentRoomData.beds.length <= 1}><DeleteIcon /></IconButton>
+                {currentRoomData.beds.length > 1 && (<Grid item size={{ xs: 12, md: 1 }} sm={2} style={styles.container}>
+                  <IconButton color="error" onPress={() => removeBed(index)} disabled={currentRoomData.beds.length <= 1}><DeleteIcon /></IconButton>
                 </Grid>)}
                 
               </Grid>
             ))}
-            <Button startIcon={<AddIcon />} variant="outlined" onClick={addBed}>Add Another Bed</Button>
+            <Button startIcon={<AddIcon />} variant="outlined" onPress={addBed}>Add Another Bed</Button>
           </Grid>
 
           {/* Number of Rooms */}
           <Grid item size={{ xs: 12 , md: 3 }}>
             <Typography variant="subtitle1" gutterBottom>Number of rooms (of this type)*</Typography>
             <Grid item size={{ xs: 12 }}>
-              <ResponsiveTextField name="numberRoom" label="Number of rooms *" type="number" fullWidth value={currentRoomData.numberRoom} onChange={(e) => handleRoomChange("numberRoom", e.target.value)} error={!!formErrors.numberRoom} helperText={formErrors.numberRoom} slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} sx={{ mt: "16px" }} />
+              <ResponsiveTextField name="numberRoom" label="Number of rooms *" type="number" fullWidth value={currentRoomData.numberRoom} onChangeText={(e) => handleRoomChange("numberRoom", e.target.value)} error={!!formErrors.numberRoom} helperText={formErrors.numberRoom} slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} sx={{ mt: "16px" }} />
             </Grid>
           </Grid>
 
           {/* Floor Bedding */}
           <Grid item size={{ xs: 12, md: 3 }}>
-            <FormControlLabel control={<Checkbox checked={currentRoomData.FloorBedding.available} onChange={(e) => handleNestedChange("FloorBedding", "available", e.target.checked)} />} label="Floor Bedding (Gaddi)" />
+            <FormControlLabel control={<Checkbox checked={currentRoomData.FloorBedding.available} onChangeText={(e) => handleNestedChange("FloorBedding", "available", e.target.checked)} />} label="Floor Bedding (Gaddi)" />
             {currentRoomData.FloorBedding.available && (
               <Grid container spacing={2} sx={{ mt: 1 }}>
                 <Grid item size={{ xs: 6 }} >
-                  <ResponsiveTextField fullWidth label="Number of Gaddi" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.FloorBedding.count} onChange={(e) => handleNestedChange("FloorBedding", "count", parseInt(e.target.value))} />
+                  <ResponsiveTextField fullWidth label="Number of Gaddi" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.FloorBedding.count} onChangeText={(e) => handleNestedChange("FloorBedding", "count", parseInt(e.target.value))} />
                 </Grid>
                 <Grid item size={{ xs: 6 }} >
-                  <ResponsiveTextField fullWidth label="People per Gaddi *" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.FloorBedding.peoplePerFloorBedding} onChange={(e) => handleNestedChange("FloorBedding", "peoplePerFloorBedding", parseInt(e.target.value))} />
+                  <ResponsiveTextField fullWidth label="People per Gaddi *" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.FloorBedding.peoplePerFloorBedding} onChangeText={(e) => handleNestedChange("FloorBedding", "peoplePerFloorBedding", parseInt(e.target.value))} />
                 </Grid>
               </Grid>
             )}
@@ -587,7 +593,7 @@ export default function RoomsForm({
             <Typography variant="subtitle1" sx={{mb:'15px'}} gutterBottom>Occupancy</Typography>
             <Grid container spacing={3}>
               <Grid item size={{ xs: 12, md: 6 }}>
-                <ResponsiveTextField fullWidth label="Base Adults *" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.occupancy?.baseAdults} onChange={(e) => handleNestedChange("occupancy", "baseAdults", parseInt(e.target.value))} error={!!formErrors.baseAdults} helperText={formErrors.baseAdults} InputProps={{ inputProps: { min: 1 },onWheel: (e) => e.target.blur(), }} />
+                <ResponsiveTextField fullWidth label="Base Adults *" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.occupancy?.baseAdults} onChangeText={(e) => handleNestedChange("occupancy", "baseAdults", parseInt(e.target.value))} error={!!formErrors.baseAdults} helperText={formErrors.baseAdults} InputProps={{ inputProps: { min: 1 },onWheel: (e) => e.target.blur(), }} />
               </Grid>
               <Grid item size={{ xs: 12, md: 6 }}>
                 <ResponsiveTextField fullWidth label="Maximum Occupancy (auto-calculated)" type="number" value={currentRoomData.occupancy?.maximumOccupancy} InputProps={{ readOnly: true }} />
@@ -600,12 +606,12 @@ export default function RoomsForm({
             <Typography variant="subtitle1" sx={{mb:'15px'}} gutterBottom>Bathroom</Typography>
             <Grid container spacing={2}>
               <Grid item size={{ xs: 12, md: 4 }} >
-                <ResponsiveTextField fullWidth label="Bathroom Count *" type="number" value={currentRoomData.bathrooms.count} onChange={(e) => handleNestedChange("bathrooms", "count", parseInt(e.target.value))} error={!!formErrors.bathroomCount} helperText={formErrors.bathroomCount} InputProps={{ inputProps: { min: 0 }, onWheel: (e) => e.target.blur(), }} />
+                <ResponsiveTextField fullWidth label="Bathroom Count *" type="number" value={currentRoomData.bathrooms.count} onChangeText={(e) => handleNestedChange("bathrooms", "count", parseInt(e.target.value))} error={!!formErrors.bathroomCount} helperText={formErrors.bathroomCount} InputProps={{ inputProps: { min: 0 }, onWheel: (e) => e.target.blur(), }} />
               </Grid>
               <Grid item size={{ xs: 12, md: 8 }}>
                 <Box display="flex" flexDirection="row">
-                  <FormControlLabel control={<Checkbox checked={currentRoomData.bathrooms.private} onChange={(e) => handleBathroomTypeChange("private", e.target.checked)} />} label="Private Bathroom" />
-                  <FormControlLabel control={<Checkbox checked={currentRoomData.bathrooms.shared} onChange={(e) => handleBathroomTypeChange("shared", e.target.checked)} />} label="Shared Bathroom" />
+                  <FormControlLabel control={<Checkbox checked={currentRoomData.bathrooms.private} onChangeText={(e) => handleBathroomTypeChange("private", e.target.checked)} />} label="Private Bathroom" />
+                  <FormControlLabel control={<Checkbox checked={currentRoomData.bathrooms.shared} onChangeText={(e) => handleBathroomTypeChange("shared", e.target.checked)} />} label="Shared Bathroom" />
                   {formErrors.bathroomType && <FormHelperText error>{formErrors.bathroomType}</FormHelperText>}
                 </Box>
               </Grid>
@@ -615,12 +621,12 @@ export default function RoomsForm({
           {/* Meal Plan */}
           {/* <Grid item size={{ xs: 12, md: 6 }}>
             <Typography variant="subtitle1" gutterBottom>Meal Plan</Typography>
-            <FormControlLabel control={<Checkbox checked={currentRoomData.mealPlan.available} onChange={(e) => handleNestedChange("mealPlan", "available", e.target.checked)} />} label="Meal Plan Available" />
+            <FormControlLabel control={<Checkbox checked={currentRoomData.mealPlan.available} onChangeText={(e) => handleNestedChange("mealPlan", "available", e.target.checked)} />} label="Meal Plan Available"}} />
             {formErrors.mealPlan && <FormHelperText error>{formErrors.mealPlan}</FormHelperText>}
             {currentRoomData.mealPlan.available && (
               <FormControl fullWidth sx={{ mt: 1 }}>
                 <InputLabel>Meal Plan Type</InputLabel>
-                <Select value={currentRoomData.mealPlan.planType} onChange={(e) => handleNestedChange("mealPlan", "planType", e.target.value)} label="Meal Plan Type">
+                <Select value={currentRoomData.mealPlan.planType} onChangeText={(e) => handleNestedChange("mealPlan", "planType", e.target.value)} label="Meal Plan Type">
                   <MenuItem value="Accommodation only">Accommodation only</MenuItem>
                   <MenuItem value="Free Breakfast">Free Breakfast</MenuItem>
                   <MenuItem value="Free Breakfast + Lunch">Free Breakfast + Lunch</MenuItem>
@@ -640,10 +646,10 @@ export default function RoomsForm({
             <Typography variant="subtitle1" sx={{mb:'15px'}} gutterBottom>Pricing</Typography>
             <Grid container spacing={3}>
               <Grid item size={{ xs: 12, md: 6 }}>
-                <ResponsiveTextField name="baseAdultsCharge" fullWidth label="Base Price (per night) *" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.pricing?.baseAdultsCharge} onChange={(e) => handleNestedChange("pricing", "baseAdultsCharge", parseFloat(e.target.value))} error={!!formErrors.baseAdultsCharge} helperText={formErrors.baseAdultsCharge} InputProps={{ startAdornment: "₹" }} />
+                <ResponsiveTextField name="baseAdultsCharge" fullWidth label="Base Price (per night) *" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.pricing?.baseAdultsCharge} onChangeText={(e) => handleNestedChange("pricing", "baseAdultsCharge", parseFloat(e.target.value))} error={!!formErrors.baseAdultsCharge} helperText={formErrors.baseAdultsCharge} InputProps={{ startAdornment: "₹" }} />
               </Grid>
               <Grid item size={{ xs: 12, md: 6 }}>
-                <ResponsiveTextField name="extraFloorBeddingCharge" fullWidth label="Extra Floor Bedding Charge" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.pricing?.extraFloorBeddingCharge} onChange={(e) => handleNestedChange("pricing", "extraFloorBeddingCharge", parseFloat(e.target.value))} InputProps={{ startAdornment: "₹" }} />
+                <ResponsiveTextField name="extraFloorBeddingCharge" fullWidth label="Extra Floor Bedding Charge" type="number" slotProps={{ htmlInput: { onWheel: (e) => e.currentTarget.blur() } }} value={currentRoomData.pricing?.extraFloorBeddingCharge} onChangeText={(e) => handleNestedChange("pricing", "extraFloorBeddingCharge", parseFloat(e.target.value))} InputProps={{ startAdornment: "₹" }} />
               </Grid>
             </Grid>
           </Grid>
@@ -661,16 +667,16 @@ export default function RoomsForm({
           </Typography>
           <Button variant="outlined" component="label" startIcon={<AddIcon />} sx={{ color: '#1035ac', borderColor: '#1035ac' }}>
             Select Photos
-            <input type="file" multiple accept="image/*,video/*" hidden onChange={handleLocalFileSelect} />
+            <TextInput type="file" multiple accept="image/*,video/*" hidden onChangeText={handleLocalFileSelect} />
           </Button>
           {pendingFiles.length > 0 && (
             <Box sx={{ display: 'flex', gap: 2, mt: 2, overflowX: 'auto', p: 1, flexWrap: 'wrap' }}>
               {pendingFiles.map((item, i) => (
                 <Box key={i} sx={{ position: 'relative', width: 140, flexShrink: 0, borderRadius: 2, overflow: 'hidden', border: item.tags.length > 0 ? '2px solid #1035ac' : '2px solid #f44336', cursor: 'pointer' }}
-                  onClick={() => { setTagDialogIndex(i); setTagDialogOpen(true); setTagDialogQueue([]); }}>
+                  onPress={() => { setTagDialogIndex(i); setTagDialogOpen(true); setTagDialogQueue([]); }}>
                   <Box sx={{ width: '100%', height: 100 }}>
                     {item.file.type.startsWith('image') ? (
-                      <img src={item.previewUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      <Image src={item.previewUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                       <video src={item.previewUrl} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     )}
@@ -683,7 +689,7 @@ export default function RoomsForm({
                     )}
                   </Box>
                   <IconButton size="small" sx={{ position: 'absolute', top: 2, right: 2, bgcolor: 'rgba(255,255,255,0.9)' }}
-                    onClick={(e) => { e.stopPropagation(); setPendingFiles(prev => prev.filter((_, idx) => idx !== i)); }}>
+                    onPress={(e) => { e.stopPropagation(); setPendingFiles(prev => prev.filter((_, idx) => idx !== i)); }}>
                     <DeleteIcon fontSize="small" color="error" />
                   </IconButton>
                 </Box>
@@ -696,14 +702,14 @@ export default function RoomsForm({
         <Dialog open={tagDialogOpen && tagDialogIndex >= 0 && tagDialogIndex < pendingFiles.length} onClose={() => setTagDialogOpen(false)} maxWidth="md" fullWidth>
           <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography component="span" variant="h6">Tag Photo {tagDialogIndex + 1} of {pendingFiles.length}</Typography>
-            <IconButton onClick={() => setTagDialogOpen(false)}><Close /></IconButton>
+            <IconButton onPress={() => setTagDialogOpen(false)}><Close /></IconButton>
           </DialogTitle>
           <DialogContent>
             {tagDialogIndex >= 0 && tagDialogIndex < pendingFiles.length && (
               <Grid container spacing={3}>
                 <Grid item xs={12} md={6}>
                   {pendingFiles[tagDialogIndex]?.file?.type?.startsWith('image') ? (
-                    <img src={pendingFiles[tagDialogIndex].previewUrl} alt="preview" style={{ width: '100%', height: 350, objectFit: 'cover', borderRadius: 8 }} />
+                    <Image src={pendingFiles[tagDialogIndex].previewUrl} style={{ width: '100%', height: 350, objectFit: 'cover', borderRadius: 8 }} />
                   ) : (
                     <video src={pendingFiles[tagDialogIndex].previewUrl} style={{ width: '100%', height: 350, borderRadius: 8 }} controls />
                   )}
@@ -724,7 +730,7 @@ export default function RoomsForm({
                   </Box>
 
                   <TextField fullWidth size="small" placeholder="Add custom tag" value={customTagInput}
-                    onChange={(e) => setCustomTagInput(e.target.value)}
+                    onChangeText={(e) => setCustomTagInput(e.target.value)}
                     onKeyPress={(e) => { if (e.key === 'Enter') handleAddCustomTagLocal(); }}
                     sx={{ mb: 2 }}
                     InputProps={{ startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} /> }} />
@@ -732,7 +738,7 @@ export default function RoomsForm({
                   <Box sx={{ maxHeight: 250, overflow: 'auto', border: '1px solid #e0e0e0', borderRadius: 1 }}>
                     <List dense>
                       {availableRoomTags.map(tag => (
-                        <ListItem key={tag} dense sx={{ cursor: 'pointer' }} onClick={() => handleTagToggleLocal(tag)}>
+                        <ListItem key={tag} dense sx={{ cursor: 'pointer' }} onPress={() => handleTagToggleLocal(tag)}>
                           <ListItemIcon>
                             <Checkbox edge="start" checked={pendingFiles[tagDialogIndex]?.tags?.includes(tag) || false} size="small" />
                           </ListItemIcon>
@@ -746,8 +752,8 @@ export default function RoomsForm({
             )}
           </DialogContent>
           <DialogActions sx={{ px: 3, pb: 2 }}>
-            <Button onClick={() => setTagDialogOpen(false)} variant="outlined">Cancel</Button>
-            <Button onClick={handleSaveTagAndNext} variant="contained" sx={{ bgcolor: '#1035ac', '&:hover': { bgcolor: '#0c2780' } }}
+            <Button onPress={() => setTagDialogOpen(false)} variant="outlined">Cancel</Button>
+            <Button onPress={handleSaveTagAndNext} variant="contained" sx={{ bgcolor: '#1035ac', '&:hover': { bgcolor: '#0c2780' } }}
               disabled={!pendingFiles[tagDialogIndex]?.tags?.length}>
               {tagDialogQueue.length > 0 ? `Save & Next (${tagDialogQueue.length} remaining)` : 'Done'}
             </Button>
@@ -758,18 +764,18 @@ export default function RoomsForm({
 
         {/* Save / Back Buttons */}
         <Divider sx={{ my: 3 }} />
-        <div className="flex justify-between items-center gap-2">
-          <Button variant="outlined" sx={{ color: '#1035ac', borderColor:"#1035ac" }} onClick={handleCancelForm}>Cancel</Button>
+        <View style={styles.container}>
+          <Button variant="outlined" sx={{ color: '#1035ac', borderColor:"#1035ac" }} onPress={handleCancelForm}>Cancel</Button>
           <Button
             variant="contained"
             sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }}
             size="large"
             disabled={isSubmitting}
-            onClick={isEditingRoom ? handleUpdateRoom : handleAddRoom}
+            onPress={isEditingRoom ? handleUpdateRoom : handleAddRoom}
           >
             {isSubmitting ? "Saving..." : (isEditingRoom ? "Update Room & Save" : "Save Room & Media")}
           </Button>
-        </div>
+        </View>
 
 
 
@@ -787,43 +793,43 @@ export default function RoomsForm({
                     <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                       Add at least one room to proceed. Each room must have at least one photo.
                     </Typography>
-      <div className="mb-6">
+      <View style={styles.container}>
         <Grid container spacing={3}>
           {localRooms.map((room, index) => (
             <Grid item size={{ xs: 12, md: 6 }} key={index}>
               <Card variant="outlined">
                 <CardContent>
-                  <div className="flex justify-between items-center mb-2">
+                  <View style={styles.container}>
                     <Typography variant="h6">{room.roomName}</Typography>
-                    <div className="flex gap-1">
-                      <IconButton size="small" color="primary" onClick={() => handleEditRoom(index)} title="Edit Room"><EditIcon /></IconButton>
-                      <IconButton size="small" color="secondary" onClick={() => handleDuplicateRoom(index)} disabled={isSubmitting} title="Duplicate Room"><ContentCopy /></IconButton>
-                      <IconButton size="small" color="error" onClick={() => handleDeleteRoom(index)} title="Delete Room"><DeleteIcon /></IconButton>
-                    </div>
-                  </div>
+                    <View style={styles.container}>
+                      <IconButton size="small" color="primary" onPress={() => handleEditRoom(index)} title="Edit Room"><EditIcon /></IconButton>
+                      <IconButton size="small" color="secondary" onPress={() => handleDuplicateRoom(index)} disabled={isSubmitting} title="Duplicate Room"><ContentCopy /></IconButton>
+                      <IconButton size="small" color="error" onPress={() => handleDeleteRoom(index)} title="Delete Room"><DeleteIcon /></IconButton>
+                    </View>
+                  </View>
                   <Typography variant="body2" color="text.secondary" gutterBottom>{room.roomSize} {room.sizeUnit}</Typography>
                   {room.description && <Typography variant="body2" color="text.secondary" gutterBottom>{room.description}</Typography>}
-                  <Divider className="my-2" />
-                  <div className="space-y-1">
+                  <Divider style={styles.container} />
+                  <View style={styles.container}>
                     <Typography variant="body2"><strong>Beds:</strong> {room.beds?.map((bed) => `${bed.count}x ${bed.bedType} (${bed.accommodates} guests)`).join(", ")}</Typography>
                     <Typography variant="body2"><strong>Occupancy:</strong> {room.occupancy?.baseAdults} adults{room.occupancy?.maximumChildren > 0 && `, up to ${room.occupancy.maximumChildren} children`}{` (max ${room.occupancy?.maximumOccupancy} total)`}</Typography>
                     <Typography variant="body2"><strong>Bathroom:</strong> {room.bathrooms.count}{room.bathrooms.private ? " private" : " shared"}</Typography>
                     <Typography variant="body2"><strong>Price:</strong> ₹{room.pricing?.baseAdultsCharge} per night</Typography>
                     <Typography variant="body2"><strong>Availability:</strong> {room.availability?.length || 0} period(s)</Typography>
-                  </div>
+                  </View>
                 </CardContent>
               </Card>
             </Grid>
           ))}
         </Grid>
-      </div>
+      </View>
 
-      <div className="flex justify-between">
+      <View style={styles.container}>
         <Button
           variant="contained"
           sx={{ mt: 2, bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }}
           startIcon={<AddIcon />}
-          onClick={() => {
+          onPress={() => {
              handleCancelForm(); // Clear all data immediately
              setIsAddingRoom(true);
           }}
@@ -831,7 +837,7 @@ export default function RoomsForm({
         >
           Add Room
         </Button>
-      </div>
+      </View>
     </Box>
   );
 }

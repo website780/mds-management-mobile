@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import RoomOccupancy from "@/component/RoomOccupancy/RoomOccupancy";
+import RoomOccupancy from "@/components/RoomOccupancy/RoomOccupancy";
 
 import { getAllProperties, getDraftProperties } from "@/redux/features/property/propertySlice";
 import PropertySelector from "@/app/(super-admin)/components/bookings/PropertySelector";

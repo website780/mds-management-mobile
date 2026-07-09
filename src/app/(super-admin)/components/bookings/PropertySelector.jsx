@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 import React from 'react';
 import { 
   Card, 
@@ -9,8 +12,8 @@ import {
   Box, 
   Typography,
   Chip 
-} from '@mui/material';
-import { Home as HomeIcon } from '@mui/icons-material';
+} from "react-native-paper";
+import { Home as HomeIcon } from 'lucide-react-native';
 
 const PropertySelector = ({ properties = [], selectedProperty, onPropertyChange, isAdmin }) => {
   return (
@@ -38,7 +41,7 @@ const PropertySelector = ({ properties = [], selectedProperty, onPropertyChange,
                 labelId="property-selector-label"
                 value={selectedProperty?._id || ''}
                 label="Select Property"
-                onChange={(e) => {
+                onChangeText={(e) => {
                   const property = properties.find(p => p._id === e.target.value);
                   onPropertyChange(property);
                 }}

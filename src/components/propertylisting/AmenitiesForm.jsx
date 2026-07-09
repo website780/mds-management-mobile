@@ -1,15 +1,16 @@
 'use client'
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList, StyleSheet, Modal } from "react-native";
 import { 
   FormControlLabel, Radio, RadioGroup, TextField, Button, 
   Grid, Typography, FormGroup, Checkbox, FormControl, FormLabel,
   Tabs, Tab, Box, Chip, Select, MenuItem, InputLabel,
   Alert, useMediaQuery, useTheme
-} from '@mui/material';
+} from "react-native-paper";
 import React, { useState } from 'react';
 
 function TabPanel({ children, value, index, ...other }) {
   return (
-    <div
+    <View 
       role="tabpanel"
       hidden={value !== index}
       id={`vertical-tabpanel-${index}`}
@@ -21,7 +22,7 @@ function TabPanel({ children, value, index, ...other }) {
           {children}
         </Box>
       )}
-    </div>
+    </View>
   );
 }
 
@@ -116,7 +117,7 @@ const renderAmenityOptions = (category, amenity) => {
   return (
     <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
       <Box
-        onClick={toggleAmenity}
+        onPress={toggleAmenity}
         sx={{
           width: '100%',
           p: 2,
@@ -158,7 +159,7 @@ const renderAmenityOptions = (category, amenity) => {
 
         {isSelected && (hasOptions || hasSuboptions) && (
           <Box 
-            onClick={(e) => e.stopPropagation()} 
+            onPress={(e) => e.stopPropagation()} 
             sx={{ 
               display: 'flex', 
               flexDirection: 'column', 
@@ -180,7 +181,7 @@ const renderAmenityOptions = (category, amenity) => {
                     return (
                       <Chip 
                         key={opt} label={opt} size="small"
-                        onClick={() => toggleOption(opt)}
+                        onPress={() => toggleOption(opt)}
                         sx={{ 
                           cursor: 'pointer',
                           fontWeight: isOptSelected ? 600 : 400,
@@ -208,7 +209,7 @@ const renderAmenityOptions = (category, amenity) => {
                     return (
                       <Chip 
                         key={sub} label={sub} size="small"
-                        onClick={() => toggleSubOption(sub)}
+                        onPress={() => toggleSubOption(sub)}
                         sx={{ 
                           cursor: 'pointer',
                           fontWeight: isSubSelected ? 600 : 400,
@@ -265,7 +266,7 @@ const renderAmenityOptions = (category, amenity) => {
           variant="scrollable"
           scrollButtons={isMobile ? 'auto' : false}
           value={selectedTab}
-          onChange={handleTabChange}
+          onChangeText={handleTabChange}
           aria-label="Amenity categories"
           sx={{
             borderRight: { xs: 0, sm: 1 },

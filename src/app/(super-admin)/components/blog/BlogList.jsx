@@ -3,10 +3,10 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import BlogCard from './BlogCard';
 import BlogFilters from './BlogFilters';
-import LoadingSpinner from '@/component/common/LoadingSpinner';
-import ErrorMessage from '@/component/common/ErrorMessage';
-import Pagination from '@/component/common/Pagination';
-import ConfirmDialog from '@/component/common/ConfirmDialog';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import Pagination from '@/components/common/Pagination';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import { fetchAllBlogs, deleteBlog, updateFilters } from '@/redux/features/blog/blogSlice';
 
 const BlogList = () => {

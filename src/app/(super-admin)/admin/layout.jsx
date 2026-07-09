@@ -1,20 +1,20 @@
 // layout.jsx
 "use client";
-import AvatarDropdown from "@/component/AvatarDropdown";
+import AvatarDropdown from "@/components/AvatarDropdown";
 import { getAllProperties } from "@/redux/features/property/propertySlice";
 import Link, { usePathname } from "expo-router";
 import {
-    Building,
-    ChartColumnStacked,
-    CirclePlus,
-    List,
-    MapPinHouse,
-    Menu,
-    NotebookPen,
-    Search,
-    UsersRound,
-    X,
-} from "lucide-react";
+  Building,
+  ChartColumnStacked,
+  CirclePlus,
+  List,
+  MapPinHouse,
+  Menu,
+  NotebookPen,
+  Search,
+  UsersRound,
+  X,
+} from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 

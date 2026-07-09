@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 "use client"
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,19 +36,19 @@ import {
   Stack,
   useTheme,
   useMediaQuery,
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  Edit as EditIcon,
-  Delete as DeleteIcon,
-  Visibility as ViewIcon,
-  Add as AddIcon,
-  Close as CloseIcon,
+  Edit as EditIcon,       // Or 'Pencil' if you prefer that style
+  Trash2 as DeleteIcon,   // 'Trash2' is the standard Lucide trash can
+  Eye as ViewIcon,
+  Plus as AddIcon,
+  X as CloseIcon,
   Download as DownloadIcon,
-  Notifications as NotificationsIcon,
-  Support as SupportIcon,
-  LockReset as LockResetIcon,
-  Block as BlockIcon,
-} from '@mui/icons-material';
+  Bell as NotificationsIcon,
+  LifeBuoy as SupportIcon, // 'Headset' is also a good alternative here
+  KeyRound as LockResetIcon,
+  Ban as BlockIcon,
+} from 'lucide-react-native';
 
 import { 
   fetchAllUsers, 
@@ -282,7 +285,7 @@ const UserManagement = () => {
       <Button
         variant="text"
         size="small"
-        onClick={() => handleView(user._id)}
+        onPress={() => handleView(user._id)}
         sx={{ color: BRAND_COLOR, fontWeight: 'bold' }}
       >
         View
@@ -290,7 +293,7 @@ const UserManagement = () => {
       <Button
         variant="text"
         size="small"
-        onClick={() => handleEdit(user._id, user.name)}
+        onPress={() => handleEdit(user._id, user.name)}
         sx={{ color: '#ff9800' }}
         startIcon={<EditIcon />}
       >
@@ -338,16 +341,15 @@ const UserManagement = () => {
               fullWidth
               placeholder="Search by name, email, or phone..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              size="small"
-            />
+              onChangeText={(e) => setSearchQuery(e.target.value)}
+              size="small" />
           </Grid>
           <Grid item size={{xs:6, md:2}}>
             <Typography variant="subtitle2" mb={1}>Role</Typography>
             <FormControl fullWidth size="small">
               <Select
                 value={roleFilter}
-                onChange={(e) => setRoleFilter(e.target.value)}
+                onChangeText={(e) => setRoleFilter(e.target.value)}
               >
                 <MenuItem value="All Roles">All Roles</MenuItem>
                 <MenuItem value="admin">Admin</MenuItem>
@@ -361,7 +363,7 @@ const UserManagement = () => {
             <FormControl fullWidth size="small">
               <Select
                 value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
+                onChangeText={(e) => setStatusFilter(e.target.value)}
               >
                 <MenuItem value="All Status">All Status</MenuItem>
                 <MenuItem value="active">Active</MenuItem>
@@ -375,7 +377,7 @@ const UserManagement = () => {
             <FormControl fullWidth size="small">
               <Select
                 value={cityFilter}
-                onChange={(e) => setCityFilter(e.target.value)}
+                onChangeText={(e) => setCityFilter(e.target.value)}
               >
                 <MenuItem value="All Cities">All Cities</MenuItem>
                 {uniqueCities.map(city => (
@@ -391,14 +393,14 @@ const UserManagement = () => {
               type="date"
               size="small"
               value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
+              onChangeText={(e) => setDateFilter(e.target.value)}
             />
           </Grid>
           <Grid item size={{xs:12, md:2}}>
             <Box display="flex" gap={1} mt={3}>
               <Button 
                 variant="outlined" 
-                onClick={clearFilters} 
+                onPress={clearFilters} 
                 size="medium"
                 sx={{ color: BRAND_COLOR, borderColor: BRAND_COLOR, '&:hover': { borderColor: BRAND_HOVER } }}
               >
@@ -586,9 +588,9 @@ const UserManagement = () => {
           </Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setDeleteDialog(false)} sx={{ color: 'text.secondary' }}>Cancel</Button>
+          <Button onPress={() => setDeleteDialog(false)} sx={{ color: 'text.secondary' }}>Cancel</Button>
           <Button 
-            onClick={handleDeleteConfirm} 
+            onPress={handleDeleteConfirm} 
             color="error" 
             variant="contained"
             disabled={isDeleting}

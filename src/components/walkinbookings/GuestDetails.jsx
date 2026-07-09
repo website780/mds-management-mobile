@@ -1,19 +1,29 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Heart, MapPin, Wifi, Car, Utensils, Shield, Droplets } from 'lucide-react-native';
+
 // components/BookingFlow/steps/GuestDetails.jsx
 import React, { useState, useMemo } from 'react';
 import {
   Box, Grid, Card, CardContent, Typography, TextField, Button, FormControl,
   InputLabel, Select, MenuItem, IconButton, Alert, Accordion,
   AccordionSummary, AccordionDetails
-} from '@mui/material';
+} from "react-native-paper";
 import { DatePicker }                from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider }     from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns }           from '@mui/x-date-pickers/AdapterDateFns';
 import { subYears }                 from 'date-fns';
 import {
-  Add, Remove, ExpandMore, Person,
-  Phone, Email, Home, CreditCard,
-} from '@mui/icons-material';
-import { AlertCircle } from 'lucide-react';
+  Plus as Add, 
+  Minus as Remove, 
+  ChevronDown as ExpandMore, 
+  User as Person,
+  Phone, 
+  Mail as Email, 
+  Home, 
+  CreditCard,
+} from 'lucide-react-native';
+import { AlertCircle } from "lucide-react-native";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -160,7 +170,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                 <TextField
                   fullWidth label="First Name *"
                   value={primaryGuest.firstName}
-                  onChange={(e) => handlePrimary('firstName', e.target.value)}
+                  onChangeText={(e) => handlePrimary('firstName', e.target.value)}
                   onBlur={() => markTouched('firstName')}
                   error={!!showError('firstName')}
                   helperText={showError('firstName')}
@@ -171,7 +181,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                 <TextField
                   fullWidth label="Last Name *"
                   value={primaryGuest.lastName}
-                  onChange={(e) => handlePrimary('lastName', e.target.value)}
+                  onChangeText={(e) => handlePrimary('lastName', e.target.value)}
                   onBlur={() => markTouched('lastName')}
                   error={!!showError('lastName')}
                   helperText={showError('lastName')}
@@ -183,7 +193,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                 <TextField
                   fullWidth label="Email *" type="email"
                   value={primaryGuest.email}
-                  onChange={(e) => handlePrimary('email', e.target.value)}
+                  onChangeText={(e) => handlePrimary('email', e.target.value)}
                   onBlur={() => markTouched('email')}
                   error={!!showError('email')}
                   helperText={showError('email')}
@@ -195,7 +205,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                 <TextField
                   fullWidth label="Phone *"
                   value={primaryGuest.phone}
-                  onChange={(e) => handlePrimary('phone', e.target.value)}
+                  onChangeText={(e) => handlePrimary('phone', e.target.value)}
                   onBlur={() => markTouched('phone')}
                   inputMode="numeric"
                   inputProps={{ maxLength: 10 }}
@@ -213,7 +223,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                   <InputLabel>Age</InputLabel>
                   <Select
                     value={primaryGuest.age}
-                    onChange={(e) => handlePrimary('age', e.target.value)}
+                    onChangeText={(e) => handlePrimary('age', e.target.value)}
                     label="Age"
                   >
                     {Array.from({ length: 83 }, (_, i) => i + 18).map((a) => (
@@ -227,7 +237,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                   <InputLabel>Gender</InputLabel>
                   <Select
                     value={primaryGuest.gender}
-                    onChange={(e) => handlePrimary('gender', e.target.value)}
+                    onChangeText={(e) => handlePrimary('gender', e.target.value)}
                     label="Gender"
                   >
                     <MenuItem value="male">Male</MenuItem>
@@ -241,7 +251,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                 <TextField
                   fullWidth label="Address *" multiline rows={2}
                   value={primaryGuest.address}
-                  onChange={(e) => handlePrimary('address', e.target.value)}
+                  onChangeText={(e) => handlePrimary('address', e.target.value)}
                   onBlur={() => markTouched('address')}
                   error={!!showError('address')}
                   helperText={showError('address')}
@@ -260,7 +270,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                   <InputLabel>ID Type</InputLabel>
                   <Select
                     value={primaryGuest.idType}
-                    onChange={(e) => handlePrimary('idType', e.target.value)}
+                    onChangeText={(e) => handlePrimary('idType', e.target.value)}
                     label="ID Type"
                     startAdornment={<CreditCard sx={{ mr: 1, color: 'action.active' }} />}
                   >
@@ -274,7 +284,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                 <TextField
                   fullWidth label="ID Number *"
                   value={primaryGuest.idNumber}
-                  onChange={(e) => handlePrimary('idNumber', e.target.value)}
+                  onChangeText={(e) => handlePrimary('idNumber', e.target.value)}
                   onBlur={() => markTouched('idNumber')}
                   error={!!showError('idNumber')}
                   helperText={showError('idNumber')}
@@ -285,7 +295,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                 <DatePicker
                   label="Date of Birth *"
                   value={primaryGuest.dateOfBirth}
-                  onChange={(date) => {
+                  onChangeText={(date) => {
                     handlePrimary('dateOfBirth', date);
                     markTouched('dateOfBirth');
                   }}
@@ -313,7 +323,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                 </Typography>
                 <Button
                   startIcon={<Add />}
-                  onClick={addAdditionalGuest}
+                  onPress={addAdditionalGuest}
                   disabled={additionalGuests.length >= additionalGuestsNeeded}
                   variant="outlined" size="small"
                   sx={{ color: '#1035ac', borderColor: '#1035ac' }}
@@ -335,7 +345,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                         <TextField
                           fullWidth label="First Name *"
                           value={guest.firstName}
-                          onChange={(e) => handleAdditional(index, 'firstName', e.target.value)}
+                          onChangeText={(e) => handleAdditional(index, 'firstName', e.target.value)}
                           error={!!fieldErrors[`ag${index}firstName`]}
                           helperText={fieldErrors[`ag${index}firstName`]}
                         />
@@ -344,7 +354,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                         <TextField
                           fullWidth label="Last Name *"
                           value={guest.lastName}
-                          onChange={(e) => handleAdditional(index, 'lastName', e.target.value)}
+                          onChangeText={(e) => handleAdditional(index, 'lastName', e.target.value)}
                           error={!!fieldErrors[`ag${index}lastName`]}
                           helperText={fieldErrors[`ag${index}lastName`]}
                         />
@@ -353,7 +363,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                         <TextField
                           fullWidth label="Age *" type="number"
                           value={guest.age}
-                          onChange={(e) => handleAdditional(index, 'age', e.target.value)}
+                          onChangeText={(e) => handleAdditional(index, 'age', e.target.value)}
                           error={!!fieldErrors[`ag${index}age`]}
                           helperText={fieldErrors[`ag${index}age`]}
                         />
@@ -363,7 +373,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                           <InputLabel>ID Type</InputLabel>
                           <Select
                             value={guest.idType}
-                            onChange={(e) => handleAdditional(index, 'idType', e.target.value)}
+                            onChangeText={(e) => handleAdditional(index, 'idType', e.target.value)}
                             label="ID Type"
                           >
                             {ID_TYPES.map((t) => (
@@ -376,7 +386,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                         <TextField
                           fullWidth label="ID Number *"
                           value={guest.idNumber}
-                          onChange={(e) => handleAdditional(index, 'idNumber', e.target.value)}
+                          onChangeText={(e) => handleAdditional(index, 'idNumber', e.target.value)}
                           error={!!fieldErrors[`ag${index}idNumber`]}
                           helperText={fieldErrors[`ag${index}idNumber`]}
                         />
@@ -386,7 +396,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                           <InputLabel>Relationship</InputLabel>
                           <Select
                             value={guest.relationship}
-                            onChange={(e) => handleAdditional(index, 'relationship', e.target.value)}
+                            onChangeText={(e) => handleAdditional(index, 'relationship', e.target.value)}
                             label="Relationship"
                           >
                             <MenuItem value="family">Family</MenuItem>
@@ -397,7 +407,7 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
                         </FormControl>
                       </Grid>
                       <Grid item xs={12} sm={6} sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                        <IconButton onClick={() => removeAdditionalGuest(index)} color="error" size="small">
+                        <IconButton onPress={() => removeAdditionalGuest(index)} color="error" size="small">
                           <Remove />
                         </IconButton>
                       </Grid>
@@ -424,22 +434,21 @@ const GuestDetails = ({ bookingData, onNext, onBack, onDataChange }) => {
               label="Special Requests (Optional)"
               multiline rows={3}
               value={specialRequests}
-              onChange={(e) => setSpecialRequests(e.target.value)}
-              placeholder="Early check-in, extra pillows, accessibility needs…"
-            />
+              onChangeText={(e) => setSpecialRequests(e.target.value)}
+              placeholder="Early check-in, extra pillows, accessibility needs…"}} />
           </CardContent>
         </Card>
 
         {/* ── Navigation ── */}
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
           <Button
-            variant="outlined" onClick={onBack} size="large"
+            variant="outlined" onPress={onBack} size="large"
             sx={{ borderColor: '#1035ac', color: '#1035ac' }}
           >
             Back
           </Button>
           <Button
-            variant="contained" onClick={handleNext} size="large"
+            variant="contained" onPress={handleNext} size="large"
             sx={{ bgcolor: '#1035ac', '&:hover': { bgcolor: '#0d2b8a' } }}
           >
             Next

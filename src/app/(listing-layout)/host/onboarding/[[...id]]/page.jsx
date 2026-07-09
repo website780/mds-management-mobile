@@ -1,11 +1,11 @@
 "use client";
-import AmenitiesForm from "@/component/propertylisting/AmenitiesForm";
-import BasicInfoForm from "@/component/propertylisting/BasicInfoForm";
-import FinanceLegalForm from "@/component/propertylisting/FinanceLegalForm";
-import LocationForm from "@/component/propertylisting/LocationForm";
-import MediaForm from "@/component/propertylisting/MediaForm";
-import PoliciesFrom from "@/component/propertylisting/PoliciesFrom";
-import RoomsForm from "@/component/propertylisting/RoomsForm";
+import AmenitiesForm from "@/components/propertylisting/AmenitiesForm";
+import BasicInfoForm from "@/components/propertylisting/BasicInfoForm";
+import FinanceLegalForm from "@/components/propertylisting/FinanceLegalForm";
+import LocationForm from "@/components/propertylisting/LocationForm";
+import MediaForm from "@/components/propertylisting/MediaForm";
+import PoliciesFrom from "@/components/propertylisting/PoliciesFrom";
+import RoomsForm from "@/components/propertylisting/RoomsForm";
 import {
     completeMediaStep,
     getDraftProperties,
@@ -29,11 +29,11 @@ import {
     Tab,
     Tabs,
     Typography,
-} from "@mui/material";
+} from "react-native-paper";
 import Link, { useParams, useRouter } from "expo-router";
 import PropTypes from "prop-types";
 import { useEffect, useRef, useState } from "react";
-import toast, { Toaster } from "react-hot-toast";
+import  { Toaster, toast } from "@backpackapp-io/react-native-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 function TabPanel({ children, value, index, ...other }) {

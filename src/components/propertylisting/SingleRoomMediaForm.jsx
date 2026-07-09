@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 'use client'
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -6,14 +9,21 @@ import {
   IconButton, Chip, TextField, Dialog, DialogTitle, DialogContent,
   DialogActions, FormControlLabel, Checkbox, Alert, LinearProgress, Badge,
   List, ListItem, ListItemIcon, ListItemText,
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  CloudUpload, Delete, Edit, Star, Close, Search, ArrowBack, ArrowForward,
-} from '@mui/icons-material';
+  UploadCloud as CloudUpload, 
+  Trash2 as Delete, 
+  Pencil as Edit, 
+  Star, 
+  X as Close, 
+  Search, 
+  ArrowLeft as ArrowBack, 
+  ArrowRight as ArrowForward,
+} from 'lucide-react-native';
 import {
   uploadRoomMedia, updateRoomMediaItem, deleteRoomMediaItem,
 } from '@/redux/features/property/propertySlice';
-import toast from 'react-hot-toast';
+import {toast} from "@backpackapp-io/react-native-toast";
 import { useConfirm } from '@/hooks/useConfirm';
 
 const SingleRoomMediaForm = ({
@@ -87,7 +97,7 @@ const SingleRoomMediaForm = ({
     setValidationError('');
 
     if (!singleRoomId) {
-      toast.error('Please save the room before uploading media.');
+      Toast.error('Please save the room before uploading media.');
       return;
     }
     if (files.length === 0) return;
@@ -114,7 +124,7 @@ const SingleRoomMediaForm = ({
       if (newlyUntagged) {
         handleEditMedia(newlyUntagged);
       } else {
-        toast.success('Media uploaded!');
+        Toast.success('Media uploaded!');
       }
     } catch (err) {
       console.error('Upload failed:', err);
@@ -156,7 +166,7 @@ const SingleRoomMediaForm = ({
 
   const handleSaveEdit = async () => {
     if (!editingMedia?.tags?.length) {
-      toast.error('Please select at least one tag before saving.');
+      Toast.error('Please select at least one tag before saving.');
       return;
     }
     try {
@@ -279,12 +289,12 @@ const SingleRoomMediaForm = ({
 
   {/* Button Section */}
   <Box sx={{ display: 'flex', flexShrink: 0 }}>
-    <input
+    <TextInput 
       ref={fileInputRef}
       type="file"
       multiple
       accept="image/*,video/*"
-      onChange={handleFileSelect}
+      onChangeText={handleFileSelect}
       style={{ display: 'none' }}
     />
     <Button
@@ -298,7 +308,7 @@ const SingleRoomMediaForm = ({
         height: 'fit-content',
         whiteSpace: 'nowrap',
       }}
-      onClick={() => fileInputRef.current?.click()}
+      onPress={() => fileInputRef.current?.click()}
       disabled={roomNotSaved || isUploading}
       title={roomNotSaved ? 'Save the room first' : 'Upload files'}
     >
@@ -340,7 +350,7 @@ const SingleRoomMediaForm = ({
                       border: '1px solid #e0e0e0', borderRadius: 2, overflow: 'hidden',
                       '&:hover': { transform: 'scale(1.02)', transition: 'transform 0.2s', boxShadow: 3 },
                     }}
-                    onClick={() => handleTagGroupClick(tag, items)}
+                    onPress={() => handleTagGroupClick(tag, items)}
                   >
                     {first.type === 'image' ? (
                       <CardMedia component="img" image={first.url} alt={first.filename}
@@ -387,7 +397,7 @@ const SingleRoomMediaForm = ({
               border: '2px solid #f44336', borderRadius: 2, overflow: 'hidden',
               '&:hover': { transform: 'scale(1.02)', transition: 'transform 0.2s', boxShadow: 3 },
             }}
-            onClick={() => handleEditMedia(item)}
+            onPress={() => handleEditMedia(item)}
           >
             {item.type === 'image' ? (
               <CardMedia component="img" image={item.url} alt={item.filename}
@@ -404,7 +414,7 @@ const SingleRoomMediaForm = ({
             <IconButton 
               size="small" 
               color="error" 
-              onClick={(e) => { 
+              onPress={(e) => { 
                 e.stopPropagation(); // Prevents the card's onClick (handleEditMedia) from firing
                 handleDeleteMedia(item._id); 
               }} 
@@ -432,8 +442,8 @@ const SingleRoomMediaForm = ({
 
       {!hideCompleteButton && (
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-          {onBack && <Button variant="outlined" sx={{ color: '#1035ac', borderColor:"#1035ac" }} onClick={onBack}>Previous</Button>}
-          <Button variant="contained" sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }} onClick={() => onSave?.()}>Save &amp; Continue</Button>
+          {onBack && <Button variant="outlined" sx={{ color: '#1035ac', borderColor:"#1035ac" }} onPress={onBack}>Previous</Button>}
+          <Button variant="contained" sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }} onPress={() => onSave?.()}>Save &amp; Continue</Button>
         </Box>
       )}
 
@@ -442,14 +452,14 @@ const SingleRoomMediaForm = ({
           <Typography variant="h6">
             {selectedTagGroup?.tag} ({selectedTagGroup?.mediaItems.length} items)
           </Typography>
-          <IconButton onClick={() => setTagGroupDialog(false)}><Close /></IconButton>
+          <IconButton onPress={() => setTagGroupDialog(false)}><Close /></IconButton>
         </DialogTitle>
 
         <DialogContent>
           {selectedTagGroup && (
             <Box sx={{ position: 'relative' }}>
               {selectedTagGroup.mediaItems[selectedImageIndex]?.type === 'image' ? (
-                <img
+                <Image 
                   src={selectedTagGroup.mediaItems[selectedImageIndex].url}
                   style={{ width: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: 8 }}
                 />
@@ -460,13 +470,13 @@ const SingleRoomMediaForm = ({
                 />
               )}
               {selectedImageIndex > 0 && (
-                <IconButton onClick={previousImage} sx={{
+                <IconButton onPress={previousImage} sx={{
                   position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)',
                   bgcolor: 'rgba(0,0,0,0.5)', color: 'white',
                 }}><ArrowBack /></IconButton>
               )}
               {selectedImageIndex < selectedTagGroup.mediaItems.length - 1 && (
-                <IconButton onClick={nextImage} sx={{
+                <IconButton onPress={nextImage} sx={{
                   position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)',
                   bgcolor: 'rgba(0,0,0,0.5)', color: 'white',
                 }}><ArrowForward /></IconButton>
@@ -483,22 +493,22 @@ const SingleRoomMediaForm = ({
           {selectedTagGroup?.mediaItems[selectedImageIndex]?.type === 'image' && (
             <Button
               startIcon={<Star />}
-              onClick={() => handleSetCover(selectedTagGroup.mediaItems[selectedImageIndex])}
+              onPress={() => handleSetCover(selectedTagGroup.mediaItems[selectedImageIndex])}
               disabled={selectedTagGroup?.mediaItems[selectedImageIndex]?.isCover}
             >
               {selectedTagGroup?.mediaItems[selectedImageIndex]?.isCover ? 'Cover Photo' : 'Set as Cover'}
             </Button>
           )}
           <Button startIcon={<Edit />}
-            onClick={() => handleEditMedia(selectedTagGroup.mediaItems[selectedImageIndex])}>
+            onPress={() => handleEditMedia(selectedTagGroup.mediaItems[selectedImageIndex])}>
             Edit Tags
           </Button>
           <Button startIcon={<Delete />} color="error"
-            onClick={() => handleDeleteMedia(selectedTagGroup.mediaItems[selectedImageIndex]._id)}>
+            onPress={() => handleDeleteMedia(selectedTagGroup.mediaItems[selectedImageIndex]._id)}>
             Delete
           </Button>
           <Box sx={{ flexGrow: 1 }} />
-          <Button onClick={() => setTagGroupDialog(false)}>Close</Button>
+          <Button onPress={() => setTagGroupDialog(false)}>Close</Button>
         </DialogActions>
       </Dialog>
 
@@ -512,7 +522,7 @@ const SingleRoomMediaForm = ({
             <Grid container spacing={3}>
               <Grid item xs={12} md={6}>
                 {editingMedia.type === 'image' ? (
-                  <img src={editingMedia.url} alt={editingMedia.filename}
+                  <Image src={editingMedia.url} alt={editingMedia.filename}
                     style={{ width: '100%', height: 400, objectFit: 'cover', borderRadius: 8 }} />
                 ) : (
                   <video src={editingMedia.url}
@@ -522,7 +532,7 @@ const SingleRoomMediaForm = ({
                   <FormControlLabel
                     control={
                       <Checkbox checked={editingMedia.isCover || false}
-                        onChange={e => setEditingMedia(prev => ({ ...prev, isCover: e.target.checked }))} />
+                        onChangeText={e => setEditingMedia(prev => ({ ...prev, isCover: e.target.checked }))} />
                     }
                     label="Set as cover photo" sx={{ mt: 2 }} />
                 )}
@@ -538,7 +548,7 @@ const SingleRoomMediaForm = ({
                   {editingMedia.tags.length > 0 ? (
                     editingMedia.tags.map(tag => (
                       <Chip key={tag} label={tag} onDelete={() => removeTag(tag)}
-                        deleteIcon={<Close />} color="primary" variant="outlined" />
+                        deleteIcon={<Close />} color="primary" variant="outlined"/>
                     ))
                   ) : (
                     <Typography variant="body2" color="text.secondary">No tags selected</Typography>
@@ -547,7 +557,7 @@ const SingleRoomMediaForm = ({
 
                 <TextField
                   fullWidth size="small" placeholder="Add custom tag"
-                  value={customTag} onChange={e => setCustomTag(e.target.value)}
+                  value={customTag} onChangeText={e => setCustomTag(e.target.value)}
                   onKeyPress={e => { if (e.key === 'Enter') addCustomTag(); }}
                   sx={{ mb: 2 }}
                   InputProps={{ startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} /> }}
@@ -556,7 +566,7 @@ const SingleRoomMediaForm = ({
                 <Box sx={{ maxHeight: 300, overflow: 'auto', border: '1px solid #e0e0e0', borderRadius: 1 }}>
                   <List dense>
                     {availableRoomTags.map(tag => (
-                      <ListItem key={tag} dense button onClick={() => handleTagToggle(tag)}>
+                      <ListItem key={tag} dense button onPress={() => handleTagToggle(tag)}>
                         <ListItemIcon>
                           <Checkbox edge="start" checked={editingMedia.tags.includes(tag)} size="small" />
                         </ListItemIcon>
@@ -571,8 +581,8 @@ const SingleRoomMediaForm = ({
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setEditDialog(false)} variant="outlined">Cancel</Button>
-          <Button onClick={handleSaveEdit} variant="contained"
+          <Button onPress={() => setEditDialog(false)} variant="outlined">Cancel</Button>
+          <Button onPress={handleSaveEdit} variant="contained"
             disabled={!editingMedia?.tags?.length}>
             Save
           </Button>

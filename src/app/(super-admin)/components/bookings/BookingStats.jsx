@@ -1,12 +1,15 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 import React, { useMemo } from 'react';
-import { Grid, Card, CardContent, Typography, Box, Chip } from '@mui/material';
+import { Grid, Card, CardContent, Typography, Box, Chip } from "react-native-paper";
 import {
-  CalendarToday as BookingsIcon,
-  Payment as PaymentIcon,
-  Cancel as CancelIcon,
-  PersonOff as NoShowIcon,
+  Calendar as BookingsIcon,
+  CreditCard as PaymentIcon, 
+  XCircle as CancelIcon,      
+  UserX as NoShowIcon,
   TrendingUp as TrendIcon
-} from '@mui/icons-material';
+} from 'lucide-react-native';
 
 const BookingStats = ({ bookings = [] }) => {
   const stats = useMemo(() => {
@@ -68,8 +71,7 @@ const BookingStats = ({ bookings = [] }) => {
           icon={<BookingsIcon />}
           title="Total Bookings"
           value={stats.totalBookings}
-          color="primary"
-        />
+          color={"primary"} />
       </Grid>
       
       <Grid item size={{xs:6, sm:6, md:2.4}}>
@@ -77,8 +79,7 @@ const BookingStats = ({ bookings = [] }) => {
           icon={<PaymentIcon />}
           title="Pending Payment"
           value={stats.pendingPayments}
-          color="warning"
-        />
+          color={"warning"} />
       </Grid>
       
       <Grid item size={{xs:6, sm:6, md:2.4}}>
@@ -86,8 +87,7 @@ const BookingStats = ({ bookings = [] }) => {
           icon={<CancelIcon />}
           title="Cancellations"
           value={stats.cancellations}
-          color="error"
-        />
+          color={"error"} />
       </Grid>
       
       <Grid item size={{xs:6, sm:6, md:2.4}}>
@@ -95,8 +95,7 @@ const BookingStats = ({ bookings = [] }) => {
           icon={<NoShowIcon />}
           title="No-Shows"
           value={stats.noShows}
-          color="grey"
-        />
+          color={"grey"} />
       </Grid>
       
       <Grid item size={{xs:6, sm:6, md:2.4}}>
@@ -104,8 +103,7 @@ const BookingStats = ({ bookings = [] }) => {
           icon={<TrendIcon />}
           title="Cancellation Rate"
           value={`${stats.cancellationRate}%`}
-          color="info"
-        />
+          color={"info"} />
       </Grid>
     </Grid>
   );

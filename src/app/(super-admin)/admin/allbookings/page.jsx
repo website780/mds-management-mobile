@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 "use client"
 import React, { useState, useEffect } from 'react';
 import {
@@ -5,7 +8,7 @@ import {
   Typography,
   CircularProgress,
 
-} from '@mui/material';
+} from "react-native-paper";
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllProperties, getDraftProperties } from '@/redux/features/property/propertySlice';
 import { fetchAllBookings, updateFilters, resetFilters, fetchBookingById,

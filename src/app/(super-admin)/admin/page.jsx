@@ -1,190 +1,135 @@
-"use client"
-import { Box, Card, CardContent, Typography, Grid, CircularProgress, Alert, Button, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
-import { useState, useEffect } from "react"
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState, useEffect } from "react";
+import { 
+  View, 
+  ScrollView, 
+  StyleSheet, 
+  Dimensions, 
+  ActivityIndicator 
+} from "react-native";
+import { 
+  Text, 
+  Card, 
+  Button,
+  useTheme 
+} from "react-native-paper";
+import { Picker } from "@react-native-picker/picker";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BarChart, PieChart, LineChart } from "react-native-gifted-charts";
+import { ArrowUp, ArrowDown, RefreshCw } from "lucide-react-native";
+import { useDispatch, useSelector } from "react-redux";
+
+// Redux imports
+import { getAllProperties } from "@/redux/features/property/propertySlice";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  Tooltip,
-} from "recharts"
-import { ArrowUpward, ArrowDownward, Refresh } from "@mui/icons-material"
-import { clearError, fetchDashboardStats, fetchRecentBookings, refreshAllDashboardData, selectDashboardError, selectDashboardLoading, selectLastUpdated, selectMetricCards, selectReservationTrend, selectRoomAvailability } from "@/redux/features/stats/dashboardSlice"
-import { getAllProperties } from "@/redux/features/property/propertySlice"
+  clearError,
+  fetchDashboardStats,
+  fetchRecentBookings,
+  refreshAllDashboardData,
+  selectDashboardError,
+  selectDashboardLoading,
+  selectLastUpdated,
+  selectMetricCards,
+  selectReservationTrend,
+  selectRoomAvailability,
+} from "@/redux/features/stats/dashboardSlice";
 
+const screenWidth = Dimensions.get("window").width;
 
+// ----------------------------------------------------
 // Component for metric cards
+// ----------------------------------------------------
 const MetricCard = ({ data }) => {
   const renderChart = () => {
+    if (!data.chartData || data.chartData.length === 0) return null;
+
     switch (data.chartType) {
       case "bar":
+        const barData = data.chartData.map(item => ({ value: item.value, frontColor: "#FF9800" }));
         return (
-          <ResponsiveContainer width="100%" height={60} style={{ overflow: "visible" }}>
-            <BarChart data={data.chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-              <Tooltip
-                cursor={{ fill: "rgba(255, 152, 0, 0.1)" }}
-                wrapperStyle={{ zIndex: 1000 }}
-                position={{ x: undefined, y: undefined }}
-                allowEscapeViewBox={{ x: true, y: true }}
-                contentStyle={{
-                  backgroundColor: "white",
-                  border: "1px solid #FF9800",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                  padding: "8px 12px",
-                  zIndex: 1000,
-                }}
-                labelStyle={{ color: "#FF9800", fontWeight: "bold" }}
-              />
-              <Bar dataKey="value" fill="#FF9800" radius={[2, 2, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        )
+          <BarChart
+            data={barData}
+            width={60}
+            height={40}
+            barWidth={8}
+            hideRules
+            hideYAxisText
+            hideAxesAndRules
+            initialSpacing={0}
+          />
+        );
       case "donut":
-        return (
-          <ResponsiveContainer width="100%" height={60} style={{ overflow: "visible" }}>
-            <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-              <Tooltip
-                cursor={false}
-                wrapperStyle={{ zIndex: 1000 }}
-                position={{ x: undefined, y: undefined }}
-                allowEscapeViewBox={{ x: true, y: true }}
-                contentStyle={{
-                  backgroundColor: "white",
-                  border: "1px solid #4CAF50",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                  padding: "8px 12px",
-                }}
-                formatter={(value, name) => [value, name]}
-              />
-              <Pie data={data.chartData} cx="50%" cy="50%" innerRadius={15} outerRadius={25} dataKey="value">
-                {data.chartData?.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    stroke={entry.color}
-                    strokeWidth={0}
-                    style={{ filter: "drop-shadow(0 0 2px rgba(0,0,0,0.1))" }}
-                  />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        )
-      case "line":
-        return (
-          <ResponsiveContainer width="100%" height={60} style={{ overflow: "visible" }}>
-            <LineChart data={data.chartData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-              <Tooltip
-                cursor={{ stroke: "#2196F3", strokeWidth: 1, strokeDasharray: "3 3" }}
-                wrapperStyle={{ zIndex: 1000 }}
-                position={{ x: undefined, y: undefined }}
-                allowEscapeViewBox={{ x: true, y: true }}
-                contentStyle={{
-                  backgroundColor: "white",
-                  border: "1px solid #2196F3",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                  padding: "8px 12px",
-                }}
-                labelStyle={{ color: "#2196F3", fontWeight: "bold" }}
-              />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="#2196F3"
-                strokeWidth={2}
-                dot={false}
-                activeDot={{ r: 4, fill: "#2196F3", stroke: "#fff", strokeWidth: 2 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )
       case "pie":
+        const pieData = data.chartData.map(item => ({ value: item.value, color: item.color || "#4CAF50" }));
         return (
-          <ResponsiveContainer width="100%" height={60} style={{ overflow: "visible" }}>
-            <PieChart margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
-              <Tooltip
-                cursor={false}
-                wrapperStyle={{ zIndex: 1000 }}
-                position={{ x: undefined, y: undefined }}
-                allowEscapeViewBox={{ x: true, y: true }}
-                contentStyle={{
-                  backgroundColor: "white",
-                  border: "1px solid #4CAF50",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                  boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-                  padding: "8px 12px",
-                }}
-                formatter={(value, name) => [value, name]}
-              />
-              <Pie data={data.chartData} cx="50%" cy="50%" outerRadius={25} dataKey="value">
-                {data.chartData?.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={entry.color}
-                    stroke={entry.color}
-                    strokeWidth={0}
-                    style={{ filter: "drop-shadow(0 0 2px rgba(0,0,0,0.1))" }}
-                  />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        )
+          <PieChart
+            data={pieData}
+            radius={20}
+            innerRadius={data.chartType === "donut" ? 12 : 0}
+            backgroundColor="transparent"
+          />
+        );
+      case "line":
+        const lineData = data.chartData.map(item => ({ value: item.value }));
+        return (
+          <LineChart
+            data={lineData}
+            width={60}
+            height={40}
+            hideDataPoints
+            hideRules
+            hideYAxisText
+            hideAxesAndRules
+            color="#2196F3"
+            thickness={2}
+            initialSpacing={0}
+          />
+        );
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   return (
-    <Card sx={{ height: "100%", overflow: "visible", position: "relative" }}>
-      <CardContent sx={{ overflow: "visible" }}>
-        <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-          <Box flex={1}>
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              {data.title}
-            </Typography>
-            <Typography variant="h4" component="div" fontWeight="bold">
-              {data.value}
-            </Typography>
-            <Box display="flex" alignItems="center" mt={1}>
-              {data.change > 0 ? (
-                <ArrowUpward sx={{ fontSize: 16, color: "success.main" }} />
-              ) : (
-                <ArrowDownward sx={{ fontSize: 16, color: "error.main" }} />
-              )}
-              <Typography variant="body2" color={data.change > 0 ? "success.main" : "error.main"} fontWeight="medium">
-                {Math.abs(data.change)}%
-              </Typography>
-            </Box>
-          </Box>
-          <Box width={80} height={60} sx={{ position: "relative", overflow: "visible" }}>
-            {renderChart()}
-          </Box>
-        </Box>
-      </CardContent>
+    <Card style={styles.metricCard}>
+      <Card.Content style={styles.metricCardContent}>
+        <View style={styles.metricInfo}>
+          <Text variant="bodySmall" style={styles.textSecondary}>
+            {data.title}
+          </Text>
+          <Text variant="headlineSmall" style={styles.metricValue}>
+            {data.value}
+          </Text>
+          <View style={styles.changeContainer}>
+            {data.change > 0 ? (
+              <ArrowUp size={16} color="#2e7d32" />
+            ) : (
+              <ArrowDown size={16} color="#d32f2f" />
+            )}
+            <Text
+              variant="bodySmall"
+              style={{
+                color: data.change > 0 ? "#2e7d32" : "#d32f2f",
+                fontWeight: "bold",
+                marginLeft: 4,
+              }}
+            >
+              {Math.abs(data.change)}%
+            </Text>
+          </View>
+        </View>
+        <View style={styles.chartContainer}>{renderChart()}</View>
+      </Card.Content>
     </Card>
-  )
-}
+  );
+};
 
+// ----------------------------------------------------
 // Main Dashboard Component
+// ----------------------------------------------------
 const HotelDashboard = () => {
   const dispatch = useDispatch();
-  
+  const theme = useTheme();
+
   // Redux selectors
   const metricCardsData = useSelector(selectMetricCards);
   const roomAvailabilityData = useSelector(selectRoomAvailability);
@@ -192,8 +137,7 @@ const HotelDashboard = () => {
   const isLoading = useSelector(selectDashboardLoading);
   const error = useSelector(selectDashboardError);
   const lastUpdated = useSelector(selectLastUpdated);
-  
-  // Get properties from the property slice
+
   const { properties } = useSelector((state) => ({
     properties: state.property.properties,
   }));
@@ -202,385 +146,401 @@ const HotelDashboard = () => {
   const [selectedProperty, setSelectedProperty] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Fetch properties on component mount
   useEffect(() => {
     dispatch(getAllProperties());
   }, [dispatch]);
 
-  // Initialize selected property
+  // Use AsyncStorage instead of localStorage
   useEffect(() => {
-    // Try to get from localStorage first
-    const storedProperty = localStorage.getItem('selectedProperty');
-    
-    if (storedProperty) {
+    const loadStoredProperty = async () => {
       try {
-        const property = JSON.parse(storedProperty);
-        setSelectedProperty(property);
-        fetchDashboardData(property);
+        const storedProperty = await AsyncStorage.getItem("selectedProperty");
+
+        if (storedProperty) {
+          const property = JSON.parse(storedProperty);
+          setSelectedProperty(property);
+          fetchDashboardData(property);
+        } else if (properties && properties.length > 0) {
+          const firstPublishedProperty = properties.find((p) => p.status === "published") || properties[0];
+          setSelectedProperty(firstPublishedProperty);
+          await AsyncStorage.setItem("selectedProperty", JSON.stringify(firstPublishedProperty));
+          fetchDashboardData(firstPublishedProperty);
+        }
       } catch (err) {
-        console.error('Error parsing selected property:', err);
+        console.error("Error loading selected property:", err);
       }
-    } else if (properties && properties.length > 0) {
-      // If no stored property, select the first published one
-      const firstPublishedProperty = properties.find(p => p.status === 'published') || properties[0];
-      setSelectedProperty(firstPublishedProperty);
-      localStorage.setItem('selectedProperty', JSON.stringify(firstPublishedProperty));
-      fetchDashboardData(firstPublishedProperty);
+    };
+
+    if (properties) {
+      loadStoredProperty();
     }
   }, [properties]);
 
-  // Function to fetch dashboard data for a property
   const fetchDashboardData = (property) => {
     if (!property) return;
-    
-    dispatch(fetchDashboardStats({ 
-      propertyId: property.id || property._id 
-    }));
-    
-    dispatch(fetchRecentBookings({ 
-      propertyId: property.id || property._id, 
-      limit: 5 
-    }));
+    const propertyId = property.id || property._id;
+    dispatch(fetchDashboardStats({ propertyId }));
+    dispatch(fetchRecentBookings({ propertyId, limit: 5 }));
   };
 
-  // Handle property selection change
-  const handlePropertyChange = (event) => {
-    const propertyId = event.target.value;
-    const property = properties.find(p => (p.id || p._id) === propertyId);
-    
+  const handlePropertyChange = async (propertyId) => {
+    const property = properties.find((p) => (p.id || p._id) === propertyId);
     if (property) {
       setSelectedProperty(property);
-      localStorage.setItem('selectedProperty', JSON.stringify(property));
+      await AsyncStorage.setItem("selectedProperty", JSON.stringify(property));
       fetchDashboardData(property);
     }
   };
 
-  // Handle manual refresh
   const handleRefresh = async () => {
     if (!selectedProperty) return;
-    
     setRefreshing(true);
     try {
-      await dispatch(refreshAllDashboardData({ 
-        propertyId: selectedProperty.id || selectedProperty._id 
-      })).unwrap();
+      await dispatch(
+        refreshAllDashboardData({
+          propertyId: selectedProperty.id || selectedProperty._id,
+        })
+      ).unwrap();
     } catch (err) {
-      console.error('Refresh failed:', err);
+      console.error("Refresh failed:", err);
     } finally {
       setRefreshing(false);
     }
   };
 
-  // Handle error dismissal
   const handleClearError = () => {
     dispatch(clearError());
   };
 
-  // Get published properties for dropdown
-  const availableProperties = properties?.filter(p => p.status === 'published') || [];
+  const availableProperties = properties?.filter((p) => p.status === "published") || [];
 
-  // Loading state
   if (isLoading && !metricCardsData.length) {
     return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <CircularProgress size={60} />
-        <Typography variant="h6" sx={{ ml: 2 }}>Loading dashboard...</Typography>
-      </Box>
+      <View style={styles.centerContainer}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text variant="titleMedium" style={{ marginTop: 16 }}>
+          Loading dashboard...
+        </Text>
+      </View>
     );
   }
 
-  // Error state
   if (error) {
     return (
-      <Box sx={{ p: 3 }}>
-        <Alert 
-          severity="error" 
-          onClose={handleClearError}
-          action={
-            <Button onClick={handleRefresh} disabled={refreshing}>
-              {refreshing ? <CircularProgress size={20} /> : <Refresh />}
-              Retry
-            </Button>
-          }
-        >
-          {error}
-        </Alert>
-      </Box>
+      <View style={styles.centerContainer}>
+        <Text style={{ color: "#d32f2f", marginBottom: 16 }}>{error}</Text>
+        <Button mode="contained" onPress={handleRefresh} loading={refreshing}>
+          Retry
+        </Button>
+      </View>
     );
   }
 
-  // No properties available
-  if (!availableProperties.length) {
+  if (properties && !availableProperties.length) {
     return (
-      <Box sx={{ p: 3, textAlign: 'center' }}>
-        <Typography variant="h6" color="text.secondary">
+      <View style={styles.centerContainer}>
+        <Text variant="titleMedium" style={styles.textSecondary}>
           No published properties found. Please publish a property first.
-        </Typography>
-      </Box>
+        </Text>
+      </View>
     );
   }
 
-  // Calculate room status data for the horizontal bar
-  const totalRooms = roomAvailabilityData.total || 1;
+  // Calculate room status for horizontal bar
+  const totalRooms = roomAvailabilityData?.total || 1;
   const roomStatusData = [
-    {
-      name: "Occupied",
-      value: (roomAvailabilityData.occupied / totalRooms) * 100,
-      count: roomAvailabilityData.occupied,
-      color: "#FF9800",
-    },
-    {
-      name: "Reserved",
-      value: (roomAvailabilityData.reserved / totalRooms) * 100,
-      count: roomAvailabilityData.reserved,
-      color: "#FFB74D",
-    },
-    {
-      name: "Available",
-      value: (roomAvailabilityData.available / totalRooms) * 100,
-      count: roomAvailabilityData.available,
-      color: "#C8E6C9",
-    },
-    {
-      name: "Not Ready",
-      value: (roomAvailabilityData.notReady / totalRooms) * 100,
-      count: roomAvailabilityData.notReady,
-      color: "#E0E0E0",
-    },
-  ];
+    { name: "Occupied", count: roomAvailabilityData?.occupied || 0, color: "#FF9800" },
+    { name: "Reserved", count: roomAvailabilityData?.reserved || 0, color: "#FFB74D" },
+    { name: "Available", count: roomAvailabilityData?.available || 0, color: "#C8E6C9" },
+    { name: "Not Ready", count: roomAvailabilityData?.notReady || 0, color: "#E0E0E0" },
+  ].map(status => ({
+    ...status,
+    percentage: (status.count / totalRooms) * 100
+  }));
+
+  // Format data for Stacked Bar Chart
+  const formattedReservationData = reservationData?.map((data) => ({
+    label: data.date,
+    stacks: [
+      { value: data.booked || 0, color: "#673AB7", marginBottom: 2 },
+      { value: data.cancelled || 0, color: "#FF9800" },
+    ],
+  })) || [];
 
   return (
-    <Box sx={{ p: 3, backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
-      {/* Header with property dropdown and refresh button */}
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3, flexWrap: 'wrap', gap: 2 }}>
-        <Typography variant="h4" fontWeight="bold">
-          Property Dashboard
-        </Typography>
+    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+      
+      {/* Header Area */}
+      <View style={styles.header}>
+        <Text variant="headlineMedium" style={styles.title}>Property Dashboard</Text>
         
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
-          {/* Property Selection Dropdown */}
-          <FormControl sx={{ minWidth: 250 }}>
-            <InputLabel id="property-select-label">Select Property</InputLabel>
-            <Select
-              labelId="property-select-label"
-              value={selectedProperty ? (selectedProperty.id || selectedProperty._id) : ''}
-              label="Select Property"
-              onChange={handlePropertyChange}
-              size="small"
+        <View style={styles.headerActions}>
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={selectedProperty ? (selectedProperty.id || selectedProperty._id) : ""}
+              onValueChange={handlePropertyChange}
+              mode="dropdown"
             >
               {availableProperties.map((property) => (
-                <MenuItem key={property.id || property._id} value={property.id || property._id}>
-                  <Box>
-                    <Typography variant="body2" fontWeight="medium">
-                      {property.placeName}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      {property.location?.city}, {property.location?.state}
-                    </Typography>
-                  </Box>
-                </MenuItem>
+                <Picker.Item
+                  key={property.id || property._id}
+                  label={`${property.placeName} (${property.location?.city})`}
+                  value={property.id || property._id}
+                />
               ))}
-            </Select>
-          </FormControl>
+            </Picker>
+          </View>
 
-          {/* Last Updated Info */}
           {lastUpdated && (
-            <Typography variant="caption" color="text.secondary">
+            <Text variant="bodySmall" style={styles.textSecondary}>
               Last updated: {new Date(lastUpdated).toLocaleTimeString()}
-            </Typography>
+            </Text>
           )}
-          
-          {/* Refresh Button */}
+
           <Button
-            variant="outlined"
-            onClick={handleRefresh}
+            mode="outlined"
+            onPress={handleRefresh}
+            loading={refreshing}
             disabled={refreshing || !selectedProperty}
-            startIcon={refreshing ? <CircularProgress size={16} /> : <Refresh />}
+            icon={() => !refreshing && <RefreshCw size={16} color={theme.colors.primary} />}
           >
             Refresh
           </Button>
-        </Box>
-      </Box>
+        </View>
+      </View>
 
-      {/* Selected Property Info Card */}
+      {/* Selected Property Info */}
       {selectedProperty && (
-        <Card sx={{ mb: 3 }}>
-          <CardContent>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Box>
-                <Typography variant="h6" fontWeight="bold">
-                  {selectedProperty.placeName}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {selectedProperty.propertyType} • {selectedProperty.location?.city}, {selectedProperty.location?.state}
-                </Typography>
-              </Box>
-              <Box sx={{ textAlign: 'right' }}>
-                <Typography variant="caption" color="text.secondary">
-                  Status
-                </Typography>
-                <Typography 
-                  variant="body2" 
-                  sx={{ 
-                    color: selectedProperty.status === 'published' ? 'success.main' : 'warning.main',
-                    textTransform: 'capitalize',
-                    fontWeight: 'medium'
-                  }}
-                >
-                  {selectedProperty.status}
-                </Typography>
-              </Box>
-            </Box>
-          </CardContent>
+        <Card style={styles.propertyCard}>
+          <Card.Content style={styles.propertyCardContent}>
+            <View>
+              <Text variant="titleLarge" style={styles.boldText}>{selectedProperty.placeName}</Text>
+              <Text variant="bodyMedium" style={styles.textSecondary}>
+                {selectedProperty.propertyType} • {selectedProperty.location?.city}, {selectedProperty.location?.state}
+              </Text>
+            </View>
+            <View style={{ alignItems: "flex-end" }}>
+              <Text variant="bodySmall" style={styles.textSecondary}>Status</Text>
+              <Text style={{
+                color: selectedProperty.status === "published" ? "#2e7d32" : "#ed6c02",
+                fontWeight: "bold",
+                textTransform: "capitalize"
+              }}>
+                {selectedProperty.status}
+              </Text>
+            </View>
+          </Card.Content>
         </Card>
       )}
 
-      {/* Metric Cards */}
-      <Grid container spacing={3} sx={{ mb: 3 }}>
+      {/* Metrics Grid */}
+      <View style={styles.gridContainer}>
         {metricCardsData.map((metric, index) => (
-          <Grid item size={{xs:12,sm:6,md:3}} key={index}>
+          <View key={index} style={styles.gridItem}>
             <MetricCard data={metric} />
-          </Grid>
+          </View>
         ))}
-      </Grid>
+      </View>
 
-      {/* Bottom Section - Charts */}
-      <Grid container spacing={3}>
-        {/* Room Availability */}
-        <Grid item size={{xs:12, md:6}}>
-          <Card sx={{ height: "388px" }}>
-            <CardContent>
-              <Typography variant="h6" gutterBottom fontWeight="bold">
-                Room Availability
-              </Typography>
+      {/* Room Availability Card */}
+      <Card style={styles.chartCard}>
+        <Card.Content>
+          <Text variant="titleMedium" style={styles.cardTitle}>Room Availability</Text>
+          
+          <View style={styles.horizontalBarContainer}>
+            {roomStatusData.map((status, index) => (
+              <View
+                key={index}
+                style={{
+                  width: `${status.percentage}%`,
+                  backgroundColor: status.color,
+                  height: "100%",
+                }}
+              />
+            ))}
+          </View>
 
-              {/* Horizontal Bar Chart */}
-              <Box sx={{ mb: 3 }}>
-                <Box
-                  sx={{
-                    display: "flex",
-                    height: 40,
-                    borderRadius: 1,
-                    overflow: "hidden",
-                    backgroundColor: "#f0f0f0",
-                  }}
-                >
-                  {roomStatusData.map((status, index) => (
-                    <Box
-                      key={index}
-                      sx={{
-                        width: `${status.value}%`,
-                        backgroundColor: status.color,
-                        transition: "all 0.3s ease",
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
+          <View style={styles.statusGrid}>
+            {roomStatusData.map((status, index) => (
+              <View key={index} style={styles.statusItem}>
+                <Text variant="bodySmall" style={styles.textSecondary}>{status.name}</Text>
+                <Text variant="titleMedium" style={styles.boldText}>{status.count}</Text>
+              </View>
+            ))}
+          </View>
+        </Card.Content>
+      </Card>
 
-              {/* Status Grid */}
-              <Grid container spacing={2}>
-                <Grid item size={{xs:6}}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Occupied
-                    </Typography>
-                    <Typography variant="h5" fontWeight="bold">
-                      {roomAvailabilityData.occupied}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item size={{xs:6}}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Reserved
-                    </Typography>
-                    <Typography variant="h5" fontWeight="bold">
-                      {roomAvailabilityData.reserved}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item size={{xs:6}}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Available
-                    </Typography>
-                    <Typography variant="h5" fontWeight="bold">
-                      {roomAvailabilityData.available}
-                    </Typography>
-                  </Box>
-                </Grid>
-                <Grid item size={{xs:6}}>
-                  <Box>
-                    <Typography variant="body2" color="text.secondary">
-                      Not Ready
-                    </Typography>
-                    <Typography variant="h5" fontWeight="bold">
-                      {roomAvailabilityData.notReady}
-                    </Typography>
-                  </Box>
-                </Grid>
-              </Grid>
-            </CardContent>
-          </Card>
-        </Grid>
+      {/* Reservation Trend Stacked Bar Chart */}
+      <Card style={styles.chartCard}>
+        <Card.Content>
+          <View style={styles.chartHeader}>
+            <Text variant="titleMedium" style={styles.cardTitle}>Reservation Trend</Text>
+            <View style={styles.legendContainer}>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: "#673AB7" }]} />
+                <Text variant="bodySmall">Booked</Text>
+              </View>
+              <View style={styles.legendItem}>
+                <View style={[styles.legendDot, { backgroundColor: "#FF9800" }]} />
+                <Text variant="bodySmall">Cancelled</Text>
+              </View>
+            </View>
+          </View>
 
-        {/* Reservation Chart */}
-        <Grid item size={{xs:12, md:6}}>
-          <Card>
-            <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6" fontWeight="bold">
-                  Reservation Trend
-                </Typography>
-                <Box display="flex" gap={2}>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Box
-                      sx={{
-                        width: 12,
-                        height: 12,
-                        backgroundColor: "#673AB7",
-                        borderRadius: "2px",
-                      }}
-                    />
-                    <Typography variant="body2">Booked</Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Box
-                      sx={{
-                        width: 12,
-                        height: 12,
-                        backgroundColor: "#FF9800",
-                        borderRadius: "2px",
-                      }}
-                    />
-                    <Typography variant="body2">Cancelled</Typography>
-                  </Box>
-                </Box>
-              </Box>
+          <View style={styles.barChartWrapper}>
+             <BarChart
+                stackData={formattedReservationData}
+                barWidth={18}
+                spacing={24}
+                roundedTop
+                roundedBottom
+                hideRules
+                xAxisThickness={0}
+                yAxisThickness={0}
+                yAxisTextStyle={{ color: 'gray', fontSize: 10 }}
+                noOfSections={4}
+                width={screenWidth - 80}
+              />
+          </View>
+        </Card.Content>
+      </Card>
 
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={reservationData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="date" axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12 }} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "white",
-                      border: "1px solid #e0e0e0",
-                      borderRadius: "4px",
-                    }}
-                  />
-                  <Bar dataKey="booked" stackId="a" fill="#673AB7" radius={[0, 0, 4, 4]} />
-                  <Bar dataKey="cancelled" stackId="a" fill="#FF9800" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
-    </Box>
+    </ScrollView>
   );
 };
+
+// ----------------------------------------------------
+// Styles
+// ----------------------------------------------------
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f5f5f5",
+  },
+  contentContainer: {
+    padding: 16,
+    paddingBottom: 40,
+  },
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    minHeight: Dimensions.get("window").height * 0.6,
+  },
+  header: {
+    marginBottom: 20,
+  },
+  title: {
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  headerActions: {
+    gap: 12,
+  },
+  pickerContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    overflow: "hidden",
+  },
+  propertyCard: {
+    marginBottom: 20,
+  },
+  propertyCardContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  gridContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 20,
+  },
+  gridItem: {
+    width: "48%", // 2 items per row on mobile screens
+    marginBottom: 16,
+  },
+  metricCard: {
+    height: 100,
+  },
+  metricCardContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    padding: 12,
+  },
+  metricInfo: {
+    flex: 1,
+  },
+  metricValue: {
+    fontWeight: "bold",
+    marginVertical: 4,
+  },
+  changeContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  chartContainer: {
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "flex-end",
+  },
+  chartCard: {
+    marginBottom: 20,
+  },
+  cardTitle: {
+    fontWeight: "bold",
+    marginBottom: 16,
+  },
+  horizontalBarContainer: {
+    flexDirection: "row",
+    height: 40,
+    borderRadius: 8,
+    overflow: "hidden",
+    backgroundColor: "#f0f0f0",
+    marginBottom: 20,
+  },
+  statusGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  statusItem: {
+    width: "50%",
+    marginBottom: 12,
+  },
+  chartHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  legendContainer: {
+    flexDirection: "row",
+    gap: 12,
+  },
+  legendItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  legendDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 2,
+  },
+  barChartWrapper: {
+    marginLeft: -10, 
+  },
+  boldText: {
+    fontWeight: "bold",
+  },
+  textSecondary: {
+    color: "#666",
+  },
+});
 
 export default HotelDashboard;

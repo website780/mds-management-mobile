@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 'use client'
 import { useState, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,15 +9,22 @@ import {
   IconButton, Chip, TextField, Dialog, DialogTitle, DialogContent,
   DialogActions, FormControlLabel, Checkbox, Alert, LinearProgress,
   List, ListItem, ListItemIcon, ListItemText, Badge, Divider, ListItemButton
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  CloudUpload, Delete, Edit, Star, Close, Search, ArrowBack, ArrowForward
-} from '@mui/icons-material';
+  UploadCloud as CloudUpload,
+  Trash2 as Delete,
+  Pencil as Edit,
+  Star,
+  X as Close,
+  Search,
+  ArrowLeft as ArrowBack,
+  ArrowRight as ArrowForward
+} from 'lucide-react-native';
 import {
   uploadPropertyMedia, updateMediaItem, deleteMediaItem, completeMediaStep
 } from '@/redux/features/property/propertySlice';
 import { useConfirm } from '@/hooks/useConfirm';
-import toast from 'react-hot-toast';
+import {toast} from "@backpackapp-io/react-native-toast";
 import ResponsiveTextField from '../ResponsiveTextField';
 
 const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
@@ -138,7 +148,7 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
 
   const handleSaveEdit = async () => {
     if (!editingMedia?.tags || editingMedia.tags.length === 0) {
-      toast.error('Please select at least one tag before saving.');
+      Toast.error('Please select at least one tag before saving.');
       return;
     }
     try {
@@ -213,10 +223,10 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
           background: 'transparent', boxShadow: 'none',
           '&:hover': { transform: 'translateY(-4px)', '& .image-container': { boxShadow: 6 } }
         }}
-        onClick={() => handleTagGroupClick(tag)}
+        onPress={() => handleTagGroupClick(tag)}
       >
         <Box sx={{ position: 'absolute', top: -6, left: 10, right: 10, height: '10px', bgcolor: '#e0e0e0', borderRadius: '8px 8px 0 0', zIndex: 0 }} />
-        <Box className="image-container" sx={{ height: 180, width: '100%', bgcolor: '#f5f5f5', borderRadius: 3, overflow: 'hidden', position: 'relative', zIndex: 1, border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box style={styles.container} sx={{ height: 180, width: '100%', bgcolor: '#f5f5f5', borderRadius: 3, overflow: 'hidden', position: 'relative', zIndex: 1, border: '1px solid #eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {firstImage.type === 'image' ? (
             <CardMedia component="img" image={firstImage.url} alt={firstImage.filename} sx={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
           ) : (
@@ -237,7 +247,7 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
   return (
     <Box>
       <ConfirmDialog />
-      <Typography sx={{ marginBottom: "20px"}} variant="subtitle1" gutterBottom><Divider className="py-5" /></Typography>
+      <Typography sx={{ marginBottom: "20px"}} variant="subtitle1" gutterBottom><Divider style={styles.container} /></Typography>
       <Typography variant="h5" gutterBottom>
         Upload Photos and Videos of the Property
         <Typography variant="body2" color="textSecondary" sx={{ mb: 3 }}>
@@ -248,8 +258,8 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
       <Box className='flex justify-between items-center mb-4'>
         <Typography variant="h5" gutterBottom></Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <input ref={fileInputRef} type="file" multiple accept="image/*,video/*" onChange={handleFileSelect} style={{ display: 'none' }} />
-          <Button variant="contained" sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }} startIcon={<CloudUpload />} onClick={() => fileInputRef.current?.click()} disabled={isLoading}>
+          <TextInput ref={fileInputRef} type="file" multiple accept="image/*,video/*" onChangeText={handleFileSelect} style={{ display: 'none' }} />
+          <Button variant="contained" sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }} startIcon={<CloudUpload />} onPress={() => fileInputRef.current?.click()} disabled={isLoading}>
             {isLoading ? 'Uploading...' : 'Upload Files'}
           </Button>
         </Box>
@@ -276,14 +286,14 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
           <Grid container spacing={2}>
             {itemsWithoutTags.map((mediaItem) => (
               <Grid item key={mediaItem._id}>
-                <Card sx={{ width: 200, height: 150, position: 'relative', cursor: 'pointer', border: '2px solid #f44336', borderRadius: 2, overflow: 'hidden', '&:hover': { transform: 'scale(1.02)', transition: 'transform 0.2s ease-in-out', boxShadow: 3 }}} onClick={() => handleEditMedia(mediaItem)}>
+                <Card sx={{ width: 200, height: 150, position: 'relative', cursor: 'pointer', border: '2px solid #f44336', borderRadius: 2, overflow: 'hidden', '&:hover': { transform: 'scale(1.02)', transition: 'transform 0.2s ease-in-out', boxShadow: 3 }}} onPress={() => handleEditMedia(mediaItem)}>
                   {mediaItem.type === 'image' ? (
                     <CardMedia component="img" image={`${mediaItem.url}`} sx={{ height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <video src={`${mediaItem.url}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} muted loop autoPlay preload="metadata" />
                   )}
                   <Chip label="Needs Tags" color="error" size="small" sx={{ position: 'absolute', top: 8, left: 8, fontSize: '0.7rem', height: 20 }} />
-                  <IconButton size="small" color="error" onClick={(e) => { e.stopPropagation(); handleDeleteMedia(mediaItem._id); }} sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(255,255,255,0.9)', '&:hover': { bgcolor: 'white' }, zIndex: 10 }}>
+                  <IconButton size="small" color="error" onPress={(e) => { e.stopPropagation(); handleDeleteMedia(mediaItem._id); }} sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(255,255,255,0.9)', '&:hover': { bgcolor: 'white' }, zIndex: 10 }}>
                     <Delete fontSize="small" />
                   </IconButton>
                 </Card>
@@ -303,24 +313,24 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
           <Typography variant="h6" component="span">
             {selectedGroupContext?.tag} ({carouselItems.length} items)
           </Typography>
-          <IconButton onClick={() => setTagGroupDialog(false)}><Close /></IconButton>
+          <IconButton onPress={() => setTagGroupDialog(false)}><Close /></IconButton>
         </DialogTitle>
         <DialogContent>
           {currentCarouselItem && (
             <Box sx={{ position: 'relative' }}>
               {currentCarouselItem.type === 'image' ? (
-              <img src={currentCarouselItem.url} style={{ width: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: 8 }} />
+              <Image src={currentCarouselItem.url} style={{ width: '100%', maxHeight: '70vh', objectFit: 'contain', borderRadius: 8 }} />
             ) : (
                 <video src={currentCarouselItem.url} style={{ width: '100%', height: '500px', borderRadius: 8 }} controls />
               )}
 
               {safeIndex > 0 && (
-                <IconButton onClick={previousImage} sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}>
+                <IconButton onPress={previousImage} sx={{ position: 'absolute', left: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}>
                   <ArrowBack />
                 </IconButton>
               )}
               {safeIndex < carouselItems.length - 1 && (
-                <IconButton onClick={nextImage} sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}>
+                <IconButton onPress={nextImage} sx={{ position: 'absolute', right: 16, top: '50%', transform: 'translateY(-50%)', bgcolor: 'rgba(0,0,0,0.5)', color: 'white' }}>
                   <ArrowForward />
                 </IconButton>
               )}
@@ -330,18 +340,18 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
         </DialogContent>
         <DialogActions>
           {currentCarouselItem?.type === 'image' && (
-            <Button startIcon={<Star />} onClick={() => handleSetCoverFromGroup(currentCarouselItem)} disabled={currentCarouselItem.isCover}>
+            <Button startIcon={<Star />} onPress={() => handleSetCoverFromGroup(currentCarouselItem)} disabled={currentCarouselItem.isCover}>
               {currentCarouselItem.isCover ? 'Cover Photo' : 'Set as Cover'}
             </Button>
           )}
-          <Button startIcon={<Edit />} onClick={() => handleEditMedia(currentCarouselItem)}>
+          <Button startIcon={<Edit />} onPress={() => handleEditMedia(currentCarouselItem)}>
             Edit Tags
           </Button>
-          <Button startIcon={<Delete />} color="error" onClick={() => handleDeleteMedia(currentCarouselItem._id)}>
+          <Button startIcon={<Delete />} color="error" onPress={() => handleDeleteMedia(currentCarouselItem._id)}>
             Delete
           </Button>
           <Box sx={{ flexGrow: 1 }} />
-          <Button onClick={() => setTagGroupDialog(false)}>Close</Button>
+          <Button onPress={() => setTagGroupDialog(false)}>Close</Button>
         </DialogActions>
       </Dialog>
 
@@ -354,16 +364,16 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
               <Grid item xs={12} md={6}>
                 <Box sx={{ position: 'relative' }}>
                   {editingMedia.type === 'image' ? (
-                    <img src={`${editingMedia.url}`} style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '8px' }} />
+                    <Image src={`${editingMedia.url}`} style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '8px' }} />
                   ) : (
                     <video src={`${editingMedia.url}`} style={{ width: '100%', height: '400px', objectFit: 'cover', borderRadius: '8px' }} controls />
                   )}
-                  <IconButton sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(255,255,255,0.8)' }} onClick={() => handleDeleteMedia(editingMedia._id)}>
+                  <IconButton sx={{ position: 'absolute', top: 8, right: 8, bgcolor: 'rgba(255,255,255,0.8)' }} onPress={() => handleDeleteMedia(editingMedia._id)}>
                     <Delete />
                   </IconButton>
                 </Box>
                 {editingMedia.type === 'image' && (
-                  <FormControlLabel control={<Checkbox checked={editingMedia.isCover || false} onChange={(e) => setEditingMedia(prev => ({ ...prev, isCover: e.target.checked }))} />} label="Set as cover photo" sx={{ mt: 2 }} />
+                  <FormControlLabel control={<Checkbox checked={editingMedia.isCover || false} onChangeText={(e) => setEditingMedia(prev => ({ ...prev, isCover: e.target.checked }))} />} label="Set as cover photo" sx={{ mt: 2 }} />
                 )}
               </Grid>
               <Grid item xs={12} md={6}>
@@ -373,12 +383,12 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
                     editingMedia.tags.map((tag) => <Chip key={tag} label={tag} onDelete={() => removeTag(tag)} deleteIcon={<Close />} color="primary" variant="outlined" />)
                   ) : (<Typography variant="body2" color="text.secondary">No tags selected</Typography>)}
                 </Box>
-                <ResponsiveTextField fullWidth placeholder="Add Tags" value={customTag} onChange={(e) => setCustomTag(e.target.value)} onKeyPress={(e) => { if (e.key === 'Enter') addCustomTag(); }} sx={{ mb: 2 }} InputProps={{ startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} /> }} />
+                <ResponsiveTextField fullWidth placeholder="Add Tags" value={customTag} onChangeText={(e) => setCustomTag(e.target.value)} onKeyPress={(e) => { if (e.key === 'Enter') addCustomTag(); }} sx={{ mb: 2 }} InputProps={{ startAdornment: <Search sx={{ mr: 1, color: 'text.secondary' }} /> }} />
                 <Box sx={{ maxHeight: 300, overflow: 'auto', border: '1px solid #e0e0e0', borderRadius: 1 }}>
                   <List dense>
                     {availableTags.map((tag) => (
                       <ListItem key={tag} dense disablePadding>
-                        <ListItemButton onClick={() => handleTagToggle(tag)}>
+                        <ListItemButton onPress={() => handleTagToggle(tag)}>
                           <ListItemIcon><Checkbox edge="start" checked={editingMedia.tags.includes(tag)} size="small" /></ListItemIcon>
                           <ListItemText primary={tag} primaryTypographyProps={{ fontSize: '0.875rem' }} />
                         </ListItemButton>
@@ -391,15 +401,15 @@ const MediaForm = ({ propertyId, onComplete, onBack, isEmbedded }) => {
           )}
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2 }}>
-          <Button onClick={() => setEditDialog(false)} variant="outlined" sx={{ color: '#1035ac', borderColor:"#1035ac" }}>Cancel</Button>
-          <Button onClick={handleSaveEdit} variant="contained" sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }} disabled={!editingMedia?.tags || editingMedia.tags.length === 0}>Save</Button>
+          <Button onPress={() => setEditDialog(false)} variant="outlined" sx={{ color: '#1035ac', borderColor:"#1035ac" }}>Cancel</Button>
+          <Button onPress={handleSaveEdit} variant="contained" sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }} disabled={!editingMedia?.tags || editingMedia.tags.length === 0}>Save</Button>
         </DialogActions>
       </Dialog>
 
       {!isEmbedded && (
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-          <Button variant="outlined" onClick={onBack} sx={{ color: '#1035ac', borderColor:"#1035ac" }}>Previous</Button>
-          <Button variant="contained" sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }} onClick={handleCompleteStep} disabled={isLoading || allMedia.length < 1 || itemsWithoutTags.length > 0}>Save & Continue</Button>
+          <Button variant="outlined" onPress={onBack} sx={{ color: '#1035ac', borderColor:"#1035ac" }}>Previous</Button>
+          <Button variant="contained" sx={{ bgcolor: '#1035ac', color: 'white', '&:hover': { bgcolor: '#0c2780' } }} onPress={handleCompleteStep} disabled={isLoading || allMedia.length < 1 || itemsWithoutTags.length > 0}>Save & Continue</Button>
         </Box>
       )}
     </Box>

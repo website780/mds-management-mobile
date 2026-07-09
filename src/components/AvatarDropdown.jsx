@@ -1,219 +1,181 @@
-"use client";
-import { logoutUser } from "@/redux/features/auth/authSlice";
-import {
-  Popover,
-  PopoverButton,
-  PopoverPanel,
-  Transition,
-} from "@headlessui/react";
-import Link, { useRouter } from "expo-router";
-import { User } from "lucide-react";
-import { Fragment } from "react";
+import React, { useState } from "react";
+import { View, Text, Image, TouchableOpacity, Modal, Pressable } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "expo-router";
+import { User } from "lucide-react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage"; // Make sure this is installed
+import { logoutUser } from "@/redux/features/auth/authSlice";
 import {
   FavouriteIcon,
   Logout03Icon,
   Task01Icon,
   UserSharingIcon,
-} from "../component/Icons";
+} from "../components/Icons";
 
 export default function AvatarDropdown() {
-  const { isAuthenticated, isLoading, user, token } = useSelector(
-    (state) => state.auth,
+  const { isAuthenticated, isLoading, user } = useSelector(
+    (state) => state.auth
   );
-  console.log(user);
-
+  
   const dispatch = useDispatch();
   const router = useRouter();
-
-  // useEffect(() => {
-  //   if (!token) {
-  //     dispatch(fetchCurrentUser());
-  //   }
-  // }, []);
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleLogout = async () => {
     try {
-      // Clear cookies manually
-      document.cookie =
-        "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
-      document.cookie =
-        "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
-      document.cookie =
-        "jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
+      // Clear React Native storage instead of cookies
+      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("authToken");
+      await AsyncStorage.removeItem("jwt");
 
       // Dispatch logout action
       await dispatch(logoutUser());
 
-      // Small delay to ensure cookies are cleared
-      await new Promise((resolve) => setTimeout(resolve, 100));
+      // Close modal
+      setIsOpen(false);
 
-      // Force hard navigation to login page
-      window.location.href = "/login";
+      // Navigate to login page
+      router.replace("/login");
     } catch (error) {
       console.error("Logout error:", error);
       // Fallback: still redirect even if there's an error
-      window.location.href = "/login";
+      router.replace("/login");
     }
+  };
+
+  const handleNavigation = (path) => {
+    setIsOpen(false);
+    router.push(path);
   };
 
   // If not authenticated, show login button
   if (!isAuthenticated && isLoading) {
     return (
-      <Link href="/login" className={`flex`}>
-        <div className="flex -space-x-2 overflow-hidden">
-          <img
-            className="inline-block size-10 rounded-full ring-2 ring-white"
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-            alt=""
+      <TouchableOpacity 
+        onPress={() => router.push("/login")} 
+        className="flex-row items-center justify-center"
+      >
+        <View className="overflow-hidden rounded-full border-2 border-white">
+          <Image
+            className="w-10 h-10"
+            source={{
+              uri: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+            }}
           />
-        </div>
-        <div className="flex h-10 w-10 items-center justify-center self-center rounded-full text-slate-700 hover:bg-slate-100 focus:outline-none   sm:h-12 sm:w-12">
-          {/* <Avatar sizeClass="w-8 h-8 sm:w-9 sm:h-9" /> */}
-        </div>
-      </Link>
+        </View>
+      </TouchableOpacity>
     );
   }
 
   return (
-    <>
-      <Popover className={`AvatarDropdown relative flex`}>
-        {({ open, close }) => (
-          <>
-            <PopoverButton className="flex items-center justify-center self-center focus:outline-none">
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-[#1035ac] flex items-center justify-center ring-2 ring-white">
+    <View className="relative z-50">
+      {/* Dropdown Trigger */}
+      <TouchableOpacity 
+        className="items-center justify-center self-center"
+        onPress={() => setIsOpen(true)}
+      >
+        <View className="w-10 h-10 rounded-full overflow-hidden bg-[#1035ac] items-center justify-center border-2 border-white">
+          {user?.profilePhoto ? (
+            <Image
+              source={{ uri: user.profilePhoto }}
+              className="w-full h-full"
+              resizeMode="cover"
+            />
+          ) : (
+            <User className="w-5 h-5 text-white" strokeWidth={1.5} />
+          )}
+        </View>
+      </TouchableOpacity>
+
+      {/* Dropdown Menu Modal */}
+      <Modal
+        visible={isOpen}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setIsOpen(false)}
+      >
+        {/* Invisible Overlay to capture outside clicks */}
+        <Pressable 
+          className="flex-1" 
+          onPress={() => setIsOpen(false)} 
+        />
+
+        {/* Dropdown Content */}
+        <View className="absolute top-16 right-4 w-64 bg-white rounded-3xl shadow-lg shadow-black/10 elevation-5">
+          <View className="px-6 py-7">
+            {/* Header / User Info */}
+            <View className="flex-row items-center mb-4">
+              <View className="w-12 h-12 rounded-full overflow-hidden bg-[#1035ac]">
                 {user?.profilePhoto ? (
-                  <img
-                    src={user.profilePhoto}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
+                  <Image
+                    source={{ uri: user.profilePhoto }}
+                    className="w-full h-full"
+                    resizeMode="cover"
                   />
                 ) : (
-                  <User className="w-5 h-5 text-white" strokeWidth={1.5} />
+                  <View className="w-full h-full items-center justify-center">
+                    <User className="w-5 h-5 text-white" strokeWidth={1.5} />
+                  </View>
                 )}
-              </div>
-            </PopoverButton>
-            <Transition
-              as={Fragment}
-              enter="transition ease-out duration-200"
-              enterFrom="opacity-0 translate-y-1"
-              enterTo="opacity-100 translate-y-0"
-              leave="transition ease-in duration-150"
-              leaveFrom="opacity-100 translate-y-0"
-              leaveTo="opacity-0 translate-y-1"
+              </View>
+
+              <View className="ml-3 flex-1">
+                <Text className="font-semibold text-base text-gray-900">
+                  {user?.name || "User"}
+                </Text>
+                <Text className="mt-0.5 text-xs text-gray-500" numberOfLines={1}>
+                  {user?.email || ""}
+                </Text>
+              </View>
+            </View>
+
+            <View className="w-full border-b border-neutral-200 mb-2" />
+
+            {/* Menu Items */}
+            <TouchableOpacity
+              onPress={() => handleNavigation("/account")}
+              className="flex-row items-center rounded-lg p-3 hover:bg-neutral-100 active:bg-neutral-200"
             >
-              <PopoverPanel className="absolute -end-5 top-13 z-10 w-screen max-w-[260px] px-4 sm:end-0 sm:px-0">
-                <div className="overflow-hidden rounded-3xl shadow-lg ring-1 ring-black ring-opacity-5">
-                  <div className="relative grid grid-cols-1 gap-6 bg-white px-6  py-7">
-                    <div className="flex items-center gap-x-3">
-                      {/* <Avatar sizeClass="w-12 h-12" /> */}
-                      <div className="flex-shrink-0 w-12 h-12 rounded-full overflow-hidden">
-                        {user?.profilePhoto ? (
-                          <img
-                            src={user.profilePhoto}
-                            alt="Profile"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-[#1035ac]">
-                            <User
-                              className="w-5 h-5 text-white"
-                              strokeWidth={1.5}
-                            />
-                          </div>
-                        )}
-                      </div>
+              <View className="items-center justify-center text-neutral-500 w-6">
+                <UserSharingIcon />
+              </View>
+              <Text className="ml-4 text-sm font-medium text-gray-800">My Account</Text>
+            </TouchableOpacity>
 
-                      <div className="flex-grow">
-                        <h4 className="font-semibold">
-                          {user?.name || "User"}
-                        </h4>
-                        <p className="mt-0.5 text-xs">{user?.email || ""}</p>
-                      </div>
-                    </div>
+            <TouchableOpacity
+              onPress={() => handleNavigation("/my-bookings")}
+              className="flex-row items-center rounded-lg p-3 hover:bg-neutral-100 active:bg-neutral-200"
+            >
+              <View className="items-center justify-center text-neutral-500 w-6">
+                <Task01Icon />
+              </View>
+              <Text className="ml-4 text-sm font-medium text-gray-800">My bookings</Text>
+            </TouchableOpacity>
 
-                    <div className="w-full border-b border-neutral-200 " />
+            <TouchableOpacity
+              onPress={() => handleNavigation("/account-savelists")}
+              className="flex-row items-center rounded-lg p-3 hover:bg-neutral-100 active:bg-neutral-200"
+            >
+              <View className="items-center justify-center text-neutral-500 w-6">
+                <FavouriteIcon />
+              </View>
+              <Text className="ml-4 text-sm font-medium text-gray-800">Wishlist</Text>
+            </TouchableOpacity>
 
-                    {/* ------------------ 1 --------------------- */}
-                    <Link
-                      href={"/account"}
-                      className="-m-3 flex items-center rounded-lg p-2 hover:bg-neutral-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50 "
-                      onClick={() => close()}
-                    >
-                      <div className="flex flex-shrink-0 items-center justify-center text-neutral-500 ">
-                        <UserSharingIcon />
-                      </div>
-                      <div className="ms-4">
-                        <p className="text-sm font-medium">{"My Account"}</p>
-                      </div>
-                    </Link>
+            <View className="w-full border-b border-neutral-200 my-2" />
 
-                    {/* ------------------ 2 --------------------- */}
-                    <Link
-                      href={"/my-bookings"}
-                      className="-m-3 flex items-center rounded-lg p-2 hover:bg-neutral-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50 "
-                      onClick={() => close()}
-                    >
-                      <div className="flex flex-shrink-0 items-center justify-center text-neutral-500 ">
-                        <Task01Icon />
-                      </div>
-                      <div className="ms-4">
-                        <p className="text-sm font-medium">{"My bookings"}</p>
-                      </div>
-                    </Link>
-
-                    {/* ------------------ 2 --------------------- */}
-                    <Link
-                      href={"/account-savelists"}
-                      className="-m-3 flex items-center rounded-lg p-2 hover:bg-neutral-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50 "
-                      onClick={() => close()}
-                    >
-                      <div className="flex flex-shrink-0 items-center justify-center text-neutral-500 ">
-                        <FavouriteIcon />
-                      </div>
-                      <div className="ms-4">
-                        <p className="text-sm font-medium">{"Wishlist"}</p>
-                      </div>
-                    </Link>
-
-                    <div className="w-full border-b border-neutral-200 " />
-
-                    {/* ------------------ 2 --------------------- */}
-                    {/* <Link
-                      href={"/mydivestays-support"}
-                      className="-m-3 flex items-center rounded-lg p-2 hover:bg-neutral-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50 "
-                      onClick={() => close()}
-                    >
-                      <div className="flex flex-shrink-0 items-center justify-center text-neutral-500 ">
-                        <HelpSquareIcon />
-                      </div>
-                      <div className="ms-4">
-                        <p className="text-sm font-medium">{"Help"}</p>
-                      </div>
-                    </Link> */}
-
-                    {/* ------------------ 2 --------------------- */}
-                    <button
-                      className="-m-3 flex items-center rounded-lg p-2 hover:bg-neutral-100 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50 "
-                      onClick={() => {
-                        close();
-                        handleLogout();
-                      }}
-                    >
-                      <div className="flex flex-shrink-0 items-center justify-center text-neutral-500 ">
-                        <Logout03Icon />
-                      </div>
-                      <div className="ms-4">
-                        <p className="text-sm font-medium">{"Logout"}</p>
-                      </div>
-                    </button>
-                  </div>
-                </div>
-              </PopoverPanel>
-            </Transition>
-          </>
-        )}
-      </Popover>
-    </>
+            <TouchableOpacity
+              onPress={handleLogout}
+              className="flex-row items-center rounded-lg p-3 hover:bg-neutral-100 active:bg-neutral-200"
+            >
+              <View className="items-center justify-center text-neutral-500 w-6">
+                <Logout03Icon />
+              </View>
+              <Text className="ml-4 text-sm font-medium text-red-500">Logout</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 }

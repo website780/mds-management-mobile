@@ -1,3 +1,8 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Heart, MapPin, Wifi, Car, Utensils, Shield, Droplets } from 'lucide-react-native';
+
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList } from "react-native";
 "use client";
 import {
     Box,
@@ -6,13 +11,13 @@ import {
     Divider,
     FormControlLabel,
     IconButton
-} from "@mui/material";
+} from "react-native-paper";
 import { GoogleMap, OverlayView, useJsApiLoader } from "@react-google-maps/api";
 import { useMemo, useState } from "react";
 
 import { applyFilters } from "@/redux/features/property/propertySlice";
 import { useRouter } from "expo-router";
-import { SlidersHorizontal, X } from "lucide-react";
+import { SlidersHorizontal, X } from "lucide-react-native";
 import { useDispatch, useSelector } from "react-redux";
 
 // --- Sub-component: Minimalist Filter Panel ---
@@ -36,20 +41,20 @@ const MapFilterPanel = ({ localFilters, onFilterChange, isSearchLoading }) => {
   ];
 
   return (
-    <Box className="w-[320px] h-full bg-white border-l border-gray-200 flex flex-col shadow-xl">
-      <div className="p-4 border-b flex items-center gap-2">
-        <SlidersHorizontal className="text-[#1035ac] w-5 h-5" />
-        <span className="font-bold text-gray-800 text-lg">Filters</span>
-      </div>
+    <Box style={styles.container}>
+      <View style={styles.container}>
+        <SlidersHorizontal style={styles.container} />
+        <Text style={styles.container}>Filters</Text>
+      </View>
 
-      <div className="flex-1 overflow-y-auto p-5 space-y-8">
+      <View style={styles.container}>
         {/* Price Section */}
         <section>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-1 h-5 bg-[#1035ac] rounded-full"></div>
-            <h4 className="font-bold text-gray-700">Price Range</h4>
-          </div>
-          <div className="flex flex-col gap-1">
+          <View style={styles.container}>
+            <View style={styles.container}></View>
+            <Text style={styles.container}>Price Range</Text>
+          </View>
+          <View style={styles.container}>
             {priceOptions.map((opt) => (
               <FormControlLabel
                 key={opt.value}
@@ -59,7 +64,7 @@ const MapFilterPanel = ({ localFilters, onFilterChange, isSearchLoading }) => {
                     checked={
                       localFilters.priceRange?.includes(opt.value) || false
                     }
-                    onChange={() => onFilterChange("priceRange", opt.value)}
+                    onChangeText={() => onFilterChange("priceRange", opt.value)}
                     disabled={isSearchLoading}
                     sx={{
                       color: "#1035ac",
@@ -68,22 +73,22 @@ const MapFilterPanel = ({ localFilters, onFilterChange, isSearchLoading }) => {
                   />
                 }
                 label={
-                  <span className="text-sm text-gray-600">{opt.label}</span>
+                  <Text style={styles.container}>{opt.label}</Text>
                 }
               />
             ))}
-          </div>
+          </View>
         </section>
 
         <Divider />
 
         {/* Amenities Section */}
         <section>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-1 h-5 bg-[#1035ac] rounded-full"></div>
-            <h4 className="font-bold text-gray-700">Amenities</h4>
-          </div>
-          <div className="grid grid-cols-2 gap-x-2">
+          <View style={styles.container}>
+            <View style={styles.container}></View>
+            <Text style={styles.container}>Amenities</Text>
+          </View>
+          <View style={styles.container}>
             {amenities.map((amenity) => (
               <FormControlLabel
                 key={amenity}
@@ -91,7 +96,7 @@ const MapFilterPanel = ({ localFilters, onFilterChange, isSearchLoading }) => {
                   <Checkbox
                     size="small"
                     checked={localFilters.amenities?.includes(amenity) || false}
-                    onChange={() => onFilterChange("amenities", amenity)}
+                    onChangeText={() => onFilterChange("amenities", amenity)}
                     disabled={isSearchLoading}
                     sx={{
                       color: "#1035ac",
@@ -100,13 +105,13 @@ const MapFilterPanel = ({ localFilters, onFilterChange, isSearchLoading }) => {
                   />
                 }
                 label={
-                  <span className="text-[12px] text-gray-600">{amenity}</span>
+                  <Text style={styles.container}>{amenity}</Text>
                 }
               />
             ))}
-          </div>
+          </View>
         </section>
-      </div>
+      </View>
     </Box>
   );
 };
@@ -164,18 +169,18 @@ export default function MapModal({ open, onClose, properties }) {
         },
       }}
     >
-      <div className="flex h-full w-full relative">
+      <View style={styles.container}>
         {/* Close Button overlaying the map */}
         <IconButton
-          onClick={onClose}
-          className="absolute top-4 right-4 z-10 bg-white/90 shadow-md hover:bg-white"
+          onPress={onClose}
+          style={styles.container}
           sx={{ position: "absolute", zIndex: 50, bgcolor: "white" }}
         >
-          <X className="w-3 h-3" />
+          <X style={styles.container} />
         </IconButton>
 
         {/* Map Side */}
-        <div className="flex-grow h-full relative">
+        <View style={styles.container}>
           <GoogleMap
             mapContainerStyle={{ width: "100%", height: "100%" }}
             center={center}
@@ -195,12 +200,12 @@ export default function MapModal({ open, onClose, properties }) {
                 {/* Container: We use 'isolate' to create a new stacking context 
       and ensure z-index works predictably here.
     */}
-                <div className="relative isolate -translate-x-1/2 -translate-y-full">
+                <View style={styles.container}>
                   {/* 1. THE PRICE MARKER */}
-                  <div
+                  <View 
                     onMouseEnter={() => setHoveredId(item._id)}
                     onMouseLeave={() => setHoveredId(null)}
-                    onClick={() => router.push(`/hotel-details/${item.slug}`)}
+                    onPress={() => router.push(`/hotel-details/${item.slug}`)}
                     className={`relative cursor-pointer px-3  w-20 py-1 rounded-full border shadow-lg transition-all font-bold text-sm whitespace-nowrap
           ${
             hoveredId === item._id
@@ -209,46 +214,46 @@ export default function MapModal({ open, onClose, properties }) {
           }`}
                   >
                     ₹{item.rooms[0]?.pricing?.baseAdultsCharge || "1,500"}
-                  </div>
+                  </View>
 
                   {/* 2. THE DETAIL CARD */}
                   {hoveredId === item._id && (
-                    <div className="absolute bottom-full left-1/2  -translate-x-1/2 mb-3 w-72 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-in fade-in slide-in-from-bottom-2">
-                      <div className="flex h-24">
-                        <img
+                    <View style={styles.container}>
+                      <View style={styles.container}>
+                        <Image 
                           src={
                             item.media?.images?.[0].url ||
                             "/api/placeholder/120/120"
                           }
                           alt={item.placeName}
-                          className="w-1/3 h-full object-cover bg-gray-100"
+                          style={styles.container}
                         />
-                        <div className="w-2/3 p-3 flex flex-col justify-between">
+                        <View style={styles.container}>
                           <div>
-                            <h4 className="font-bold text-xs text-gray-900 truncate">
+                            <Text style={styles.container}>
                               {item.placeName}
-                            </h4>
-                            <p className="text-[10px] text-gray-400">
+                            </Text>
+                            <Text style={styles.container}>
                               {item.location?.city}
-                            </p>
-                          </div>
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-sm font-bold text-[#1035ac]">
+                            </Text>
+                          </View>
+                          <View style={styles.container}>
+                            <Text style={styles.container}>
                               ₹{item.price || "1,500"}
-                            </span>
-                            <span className="text-[9px] text-gray-400">
+                            </Text>
+                            <Text style={styles.container}>
                               /Night
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                            </Text>
+                          </View>
+                        </View>
+                      </View>
+                    </View>
                   )}
-                </div>
+                </View>
               </OverlayView>
             ))}
           </GoogleMap>
-        </div>
+        </View>
 
         {/* Clean Filter Panel Side */}
         <MapFilterPanel
@@ -256,7 +261,7 @@ export default function MapModal({ open, onClose, properties }) {
           onFilterChange={handleFilterChange}
           isSearchLoading={isSearchLoading}
         />
-      </div>
+      </View>
     </Dialog>
   );
 }

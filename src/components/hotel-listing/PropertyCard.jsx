@@ -1,3 +1,8 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Heart, MapPin, Wifi, Car, Utensils, Shield, Droplets } from 'lucide-react-native';
+
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList } from "react-native";
 // components/PropertyCard.jsx
 import {
     checkWishlistStatus,
@@ -5,8 +10,8 @@ import {
     selectIsInWishlist,
     toggleWishlist,
 } from "@/redux/features/wishlist/wishlistSlice";
-import { Button } from "@mui/material";
-import Link, { useRouter } from "expo-router";
+import { Button } from "react-native-paper";
+import { useRouter, Link } from "expo-router";
 import {
     Car,
     Droplets,
@@ -15,9 +20,9 @@ import {
     Shield,
     Utensils,
     Wifi,
-} from "lucide-react";
+} from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { toast } from "react-hot-toast";
+import { toast } from "@backpackapp-io/react-native-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 export function PropertyCard({
@@ -51,15 +56,15 @@ export function PropertyCard({
   const getAmenityIcon = (amenity) => {
     switch (amenity.toLowerCase()) {
       case "wifi":
-        return <Wifi className="w-4 h-4" />;
+        return <Wifi style={styles.container} />;
       case "parking":
-        return <Car className="w-4 h-4" />;
+        return <Car style={styles.container} />;
       case "meals":
-        return <Utensils className="w-4 h-4" />;
+        return <Utensils style={styles.container} />;
       case "security":
-        return <Shield className="w-4 h-4" />;
+        return <Shield style={styles.container} />;
       case "hot water":
-        return <Droplets className="w-4 h-4" />;
+        return <Droplets style={styles.container} />;
       default:
         return null;
     }
@@ -79,12 +84,12 @@ export function PropertyCard({
     try {
       const result = await dispatch(toggleWishlist(id)).unwrap();
       if (result.data.action === "added") {
-        toast.success("Added to wishlist!");
+        Toast.success("Added to wishlist!");
       } else {
-        toast.success("Removed from wishlist!");
+        Toast.success("Removed from wishlist!");
       }
     } catch (error) {
-      toast.error(error || "Failed to update wishlist");
+      Toast.error(error || "Failed to update wishlist");
     }
   };
 
@@ -94,92 +99,92 @@ export function PropertyCard({
   const hasMoreImages = images.length > 4;
 
   return (
-    <Link href={`/hotel-details/${slug}`} className="block">
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 border border-gray-100 hover:border-blue-200 group">
-        <div className="flex flex-col">
+    <Link href={`/hotel-details/${slug}`} style={styles.container}>
+      <View style={styles.container}>
+        <View style={styles.container}>
           {/* ── Mobile Layout ─────────────────────────────────────── */}
-          <div className="md:hidden">
-            <div className="relative w-full">
+          <View style={styles.container}>
+            <View style={styles.container}>
               {verified && (
-                <div className="absolute top-3 left-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1 z-5 shadow-lg">
-                  <span className="text-sm">✓</span> Verified
-                </div>
+                <View style={styles.container}>
+                  <Text style={styles.container}>✓</Text> Verified
+                </View>
               )}
 
               {/* ✅ Wishlist button - stopPropagation prevents Link navigation */}
-              <button
-                onClick={handleWishlistToggle}
+              <Pressable 
+                onPress={handleWishlistToggle}
                 disabled={isActionLoading}
-                className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full z-10 shadow-lg hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                style={styles.container}
               >
                 <Heart
                   className={`w-5 h-5 transition-all ${
                     isWishlisted ? "fill-red-500 text-red-500" : "text-gray-600"
                   } ${isActionLoading ? "animate-pulse" : ""}`}
                 />
-              </button>
+              </Pressable>
 
-              <div className="h-56 relative overflow-hidden">
+              <View style={styles.container}>
                 {imageUrl ? (
-                  <img
+                  <Image 
                     src={imageUrl}
                     alt={currentImage.filename || name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    style={styles.container}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-purple-100">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                        <span className="text-3xl">🏨</span>
-                      </div>
-                      <div className="text-sm text-gray-500 font-medium">
+                  <View style={styles.container}>
+                    <View style={styles.container}>
+                      <View style={styles.container}>
+                        <Text style={styles.container}>🏨</Text>
+                      </View>
+                      <View style={styles.container}>
                         Hotel Image
-                      </div>
-                    </div>
-                  </div>
+                      </View>
+                    </View>
+                  </View>
                 )}
                 {images.length > 0 && (
-                  <div className="absolute bottom-3 right-3 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-medium">
+                  <View style={styles.container}>
                     {currentImageIndex + 1} / {images.length}
-                  </div>
+                  </View>
                 )}
-              </div>
-            </div>
+              </View>
+            </View>
 
-            <div className="p-5">
-              <h3 className="text-xl font-bold mb-1 text-gray-900 group-hover:text-blue-600 transition-colors">
+            <View style={styles.container}>
+              <Text style={styles.container}>
                 {name}
-              </h3>
-              <div className="flex items-center gap-1 text-gray-600 text-sm mb-3">
-                <MapPin className="w-4 h-4 text-red-500" />
-                <p>{location}</p>
-              </div>
+              </Text>
+              <View style={styles.container}>
+                <MapPin style={styles.container} />
+                <p>{location}</Text>
+              </View>
 
-              <div className="flex flex-wrap gap-2 mb-5">
+              <View style={styles.container}>
                 {amenities.slice(0, 4).map((amenity) => (
-                  <div
+                  <View 
                     key={amenity}
-                    className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-medium text-blue-700 flex items-center gap-1"
+                    style={styles.container}
                   >
                     {getAmenityIcon(amenity)}
-                    <span>{amenity}</span>
-                  </div>
+                    <span>{amenity}</Text>
+                  </View>
                 ))}
-              </div>
+              </View>
 
-              <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+              <View style={styles.container}>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">
+                  <View style={styles.container}>
                     Starting from
-                  </div>
-                  <div className="text-sm text-gray-400 line-through">
+                  </View>
+                  <View style={styles.container}>
                     ₹{Math.round(price * 1.2).toLocaleString()}
-                  </div>
-                  <div className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  </View>
+                  <View style={styles.container}>
                     ₹{price.toLocaleString()}
-                  </div>
-                  <div className="text-xs text-gray-500">per night</div>
-                </div>
+                  </View>
+                  <View style={styles.container}>per night</View>
+                </View>
                 {/* ✅ Inner <a> removed – outer Link handles navigation */}
                 <Button
                   variant="contained"
@@ -205,128 +210,128 @@ export function PropertyCard({
                 >
                   View Details
                 </Button>
-              </div>
-            </div>
-          </div>
+              </View>
+            </View>
+          </View>
 
           {/* ── Desktop Layout ────────────────────────────────────── */}
-          <div className="hidden md:flex">
-            <div className="relative w-80 bg-gray-200 flex-shrink-0">
+          <View style={styles.container}>
+            <View style={styles.container}>
               {verified && (
-                <div className="absolute top-3 left-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1 z-2 shadow-lg">
-                  <span className="text-sm">✓</span> Verified
-                </div>
+                <View style={styles.container}>
+                  <Text style={styles.container}>✓</Text> Verified
+                </View>
               )}
 
               {/* ✅ Wishlist button */}
-              <button
-                onClick={handleWishlistToggle}
+              <Pressable 
+                onPress={handleWishlistToggle}
                 disabled={isActionLoading}
-                className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full z-2 shadow-lg hover:scale-110 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                style={styles.container}
               >
                 <Heart
                   className={`w-5 h-5 transition-all ${
                     isWishlisted ? "fill-red-500 text-red-500" : "text-gray-600"
                   } ${isActionLoading ? "animate-pulse" : ""}`}
                 />
-              </button>
+              </Pressable>
 
-              <div className="h-52 relative overflow-hidden rounded-tl-2xl">
+              <View style={styles.container}>
                 {imageUrl ? (
-                  <img
+                  <Image 
                     src={imageUrl}
                     alt={currentImage.filename || name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    style={styles.container}
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-100">
-                    <div className="text-center">
-                      <div className="w-20 h-20 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                        <span className="text-3xl">🏨</span>
-                      </div>
-                      <div className="text-sm text-gray-500 font-medium">
+                  <View style={styles.container}>
+                    <View style={styles.container}>
+                      <View style={styles.container}>
+                        <Text style={styles.container}>🏨</Text>
+                      </View>
+                      <View style={styles.container}>
                         Hotel Image
-                      </div>
-                    </div>
-                  </div>
+                      </View>
+                    </View>
+                  </View>
                 )}
-              </div>
+              </View>
 
               {/* ✅ Thumbnails - stopPropagation prevents Link navigation */}
               {thumbnailImages.length > 0 && (
-                <div className="flex gap-1.5 p-3 bg-gradient-to-r from-gray-50 to-blue-50 rounded-bl-2xl">
+                <View style={styles.container}>
                   {thumbnailImages.map((image, index) => {
                     const thumbUrl = `${image.url}`;
                     const isLast = index === 3 && hasMoreImages;
                     return (
-                      <div
+                      <View 
                         key={index}
                         className={`w-16 h-16 relative cursor-pointer overflow-hidden rounded-lg ${
                           index === currentImageIndex
                             ? "ring-2 ring-blue-500 ring-offset-2"
                             : ""
                         } hover:scale-105 transition-all duration-300 shadow-md`}
-                        onClick={(e) => handleThumbnailClick(e, index)}
+                        onPress={(e) => handleThumbnailClick(e, index)}
                       >
-                        <img
+                        <Image 
                           src={thumbUrl}
                           alt={image.filename || `${name} ${index + 1}`}
-                          className="w-full h-full object-cover hover:brightness-110 transition-all"
+                          style={styles.container}
                         />
                         {isLast && (
-                          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center">
-                            <div className="text-white text-xs font-bold text-center">
-                              <div className="text-base">
+                          <View style={styles.container}>
+                            <View style={styles.container}>
+                              <View style={styles.container}>
                                 +{images.length - 4}
-                              </div>
-                              <div className="text-[10px]">more</div>
-                            </div>
-                          </div>
+                              </View>
+                              <View style={styles.container}>more</View>
+                            </View>
+                          </View>
                         )}
-                      </div>
+                      </View>
                     );
                   })}
-                </div>
+                </View>
               )}
-            </div>
+            </View>
 
             {/* Desktop Content */}
-            <div className="flex-1 p-6">
-              <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4 h-full">
-                <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-1 text-gray-900 group-hover:text-blue-600 transition-colors">
+            <View style={styles.container}>
+              <View style={styles.container}>
+                <View style={styles.container}>
+                  <Text style={styles.container}>
                     {name}
-                  </h3>
-                  <div className="flex items-center gap-1 text-gray-600 mb-4">
-                    <MapPin className="w-4 h-4 text-red-500" />
-                    <p className="font-medium">{location}</p>
-                  </div>
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  </Text>
+                  <View style={styles.container}>
+                    <MapPin style={styles.container} />
+                    <Text style={styles.container}>{location}</Text>
+                  </View>
+                  <View style={styles.container}>
                     {amenities.slice(0, 6).map((amenity) => (
-                      <div
+                      <View 
                         key={amenity}
-                        className="bg-gradient-to-r from-blue-50 to-purple-50 border border-blue-200 px-3 py-1.5 rounded-lg text-xs font-medium text-blue-700 flex items-center gap-1"
+                        style={styles.container}
                       >
                         {getAmenityIcon(amenity)}
-                        <span>{amenity}</span>
-                      </div>
+                        <span>{amenity}</Text>
+                      </View>
                     ))}
-                  </div>
-                </div>
+                  </View>
+                </View>
 
-                <div className="text-right lg:ml-6 flex flex-col justify-between h-full">
+                <View style={styles.container}>
                   <div>
-                    <div className="text-xs text-gray-500 mb-1">
+                    <View style={styles.container}>
                       Starting from
-                    </div>
-                    <div className="text-sm text-gray-400 line-through mb-1">
+                    </View>
+                    <View style={styles.container}>
                       ₹{Math.round(price * 1.2).toLocaleString()}
-                    </div>
-                    <div className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-1">
+                    </View>
+                    <View style={styles.container}>
                       ₹{price.toLocaleString()}
-                    </div>
-                    <div className="text-sm text-gray-500 mb-1">per night</div>
-                  </div>
+                    </View>
+                    <View style={styles.container}>per night</View>
+                  </View>
                   <Button
                     sx={{
                       background:
@@ -351,12 +356,12 @@ export function PropertyCard({
                   >
                     View Details
                   </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </View>
     </Link>
   );
 }

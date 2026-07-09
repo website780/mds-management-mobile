@@ -1,3 +1,6 @@
+
+import { useRouter } from 'expo-router';
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList, StyleSheet, Modal } from "react-native";
 import { useEffect, useState } from 'react';
 import { 
   TextField, FormControl, InputLabel, Select, 
@@ -7,10 +10,10 @@ import {
   ListItemText,
   useTheme,
   useMediaQuery
-} from '@mui/material';
+} from "react-native-paper";
 import { useDispatch, useSelector } from 'react-redux';
 import { checkEmailVerificationStatus, sendEmailOTP, verifyEmailOTP } from '@/redux/features/property/propertySlice';
-import toast from 'react-hot-toast';
+import {toast} from "@backpackapp-io/react-native-toast";
 import ResponsiveFormControl from '../ResponsiveFormControl';
 import ResponsiveTextField from '../ResponsiveTextField';
 export default function BasicInfoForm({ formData, onChange, errors, propertyId, onEmailVerified }) {
@@ -37,7 +40,7 @@ export default function BasicInfoForm({ formData, onChange, errors, propertyId, 
 
   const handleSendOTP = async () => {
     if (!formData.email) {
-      toast.error('Please enter email address first');
+      Toast.error('Please enter email address first');
       return;
     }
     
@@ -70,10 +73,10 @@ export default function BasicInfoForm({ formData, onChange, errors, propertyId, 
         await onEmailVerified();
       }
       
-      toast.success('Email verified successfully!');
+      Toast.success('Email verified successfully!');
     } catch (error) {
       console.error('Failed to verify OTP:', error);
-      toast.error('Failed to verify OTP. Please try again.');
+      Toast.error('Failed to verify OTP. Please try again.');
     }
   };
 
@@ -109,7 +112,7 @@ const bookingYearOptions = formData.propertyBuilt
   : baseYears;
 
   return (
-    <div>
+    <View>
 
       <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 1 }}>
             Property Details
@@ -147,7 +150,7 @@ const bookingYearOptions = formData.propertyBuilt
             <InputLabel>Property Type</InputLabel>
             <Select
               value={formData.propertyType || ''}
-              onChange={(e) => onChange('propertyType', e.target.value)}
+              onChangeText={(e) => onChange('propertyType', e.target.value)}
               label="Property Type"
             >
               {propertyTypes.map(type => (
@@ -187,7 +190,7 @@ const bookingYearOptions = formData.propertyBuilt
             fullWidth
             label="Name of the Property"
             value={formData.placeName || ''}
-            onChange={(e) => onChange('placeName', e.target.value)}
+            onChangeText={(e) => onChange('placeName', e.target.value)}
             error={!!errors?.placeName}
             helperText={errors?.placeName}
           />
@@ -222,7 +225,7 @@ const bookingYearOptions = formData.propertyBuilt
             <InputLabel>When was the property built? (Optional)</InputLabel>
            <Select
             value={formData.propertyBuilt || ''}
-            onChange={(e) => onChange('propertyBuilt', e.target.value)}
+            onChangeText={(e) => onChange('propertyBuilt', e.target.value)}
             label="When was the property built? (Optional)"
           >
             {builtYearOptions.map(year => (
@@ -261,7 +264,7 @@ const bookingYearOptions = formData.propertyBuilt
             <InputLabel>Accepting booking since? (Optional)</InputLabel>
             <Select
               value={formData.bookingSince || ''}
-              onChange={(e) => onChange('bookingSince', e.target.value)}
+              onChangeText={(e) => onChange('bookingSince', e.target.value)}
               label="Accepting booking since? (Optional)"
             >
               {bookingYearOptions.map(year => (
@@ -287,18 +290,17 @@ const bookingYearOptions = formData.propertyBuilt
 <Grid container sx={{mt:3}} spacing={2}>
 
           <Grid item size={{xs:12, md:5}}>
-        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
+        <View style={{ display: 'flex', gap: '10px', alignItems: 'flex-end' }}>
           <ResponsiveTextField
             sx={{ flex: 1 /* your existing styles */ }}
             fullWidth
             label="Email Address"
             type="email"
             value={formData.email}
-            onChange={(e) => onChange('email', e.target.value)}
+            onChangeText={(e) => onChange('email', e.target.value)}
             error={!!errors.email}
-            placeholder=""
-          />
-        </div>
+            placeholder={{ label: "Email Address" }} />
+        </View>
       </Grid>
 
 
@@ -330,7 +332,7 @@ const bookingYearOptions = formData.propertyBuilt
             
             label="Mobile Number"
             value={formData.mobileNumber}
-            onChange={(e) => {
+            onChangeText={(e) => {
               const value = e.target.value.replace(/\D/g, ""); // strips non-digits
               onChange('mobileNumber', value);
             }}
@@ -350,7 +352,7 @@ const bookingYearOptions = formData.propertyBuilt
     <Select
       multiple
       value={Array.isArray(formData.languagesSpoken) ? formData.languagesSpoken : []}
-      onChange={(e) => onChange('languagesSpoken', typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
+      onChangeText={(e) => onChange('languagesSpoken', typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
       renderValue={(selected) => Array.isArray(selected) ? selected.join(', ') : selected}
       label="Languages Spoken"
     >
@@ -391,7 +393,7 @@ const bookingYearOptions = formData.propertyBuilt
             fullWidth
             label="Landline (Optional)"
             value={formData.landline}
-            onChange={(e) => onChange('landline', e.target.value)}
+            onChangeText={(e) => onChange('landline', e.target.value)}
             error={!!errors.landline}
             helperText={errors.landline}
             placeholder=""
@@ -406,6 +408,6 @@ const bookingYearOptions = formData.propertyBuilt
         </Grid>
       </Grid>
       </Grid>
-    </div>
+    </View>
   );
 }

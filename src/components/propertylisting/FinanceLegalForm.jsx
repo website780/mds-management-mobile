@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 // components/FinanceLegalForm.jsx
 import React, { useState, useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,17 +9,21 @@ import {
   FormControlLabel, RadioGroup, Radio, Button, Paper, Grid, Alert,
   CircularProgress, Chip, FormLabel, Card, CardContent, CardMedia,
   styled, IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  CloudUpload as CloudUploadIcon, CheckCircle as CheckCircleIcon,
-  LocationOn as LocationIcon, Delete as DeleteIcon, Close as CloseIcon,
-  ArrowBack, ArrowForward,
-} from '@mui/icons-material';
+  UploadCloud as CloudUploadIcon, // Or 'Upload' 
+  CheckCircle2 as CheckCircleIcon, // 'CheckCircle' also exists, but 'CheckCircle2' matches Material better
+  MapPin as LocationIcon,
+  Trash2 as DeleteIcon,
+  X as CloseIcon,
+  ArrowLeft as ArrowBack,
+  ArrowRight as ArrowForward,
+} from 'lucide-react-native';
 import {
   completeFinanceLegalStep, getFinanceLegal, updateFinanceDetails,
   updateLegalDetails, uploadRegistrationDocument, deleteRegistrationDocument,
 } from '@/redux/features/property/propertySlice';
-import toast, { Toaster } from "react-hot-toast";
+import  { Toaster, toast } from "@backpackapp-io/react-native-toast";
 import { useConfirm } from '@/hooks/useConfirm';
 import ResponsiveTextField from '../ResponsiveTextField';
 import ResponsiveFormControl from '../ResponsiveFormControl';
@@ -133,11 +140,11 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
         .unwrap()
         .then(() => {
           onComplete?.();
-          toast.success('Finance & Legal step completed!');
+          Toast.success('Finance & Legal step completed!');
         })
         .catch((error) => {
           hasAutoCompleted.current = false;
-          toast.error(`Validation errors:\n${error.errors?.join('\n') || error.message}`);
+          Toast.error(`Validation errors:\n${error.errors?.join('\n') || error.message}`);
         });
     }
   }, [currentFinanceLegal, dispatch, propertyId, onComplete]);
@@ -147,7 +154,7 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
     saveAll: async () => {
       if (financeData.bankDetails.accountNumber !== financeData.bankDetails.reenterAccountNumber) {
         setAccountNumberError('Account numbers do not match');
-        toast.error('Account numbers do not match');
+        Toast.error('Account numbers do not match');
         return false;
       }
       
@@ -158,23 +165,23 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
 
         // 2. Upload pending documents ONLY after text fields are successfully saved
         if (pendingFiles.length > 0) {
-          const toastId = toast.loading('Uploading documents...');
+          const toastId = Toast.loading('Uploading documents...');
           try {
             for (const pending of pendingFiles) {
               const formData = new FormData();
               formData.append('registrationDocument', pending.file);
               await dispatch(uploadRegistrationDocument({ propertyId, formData })).unwrap();
             }
-            toast.success('All documents uploaded successfully!', { id: toastId });
+            Toast.success('All documents uploaded successfully!', { id: toastId });
             setPendingFiles([]); // Clear pending files after success
           } catch (uploadErr) {
-            toast.error(uploadErr.message || 'Failed to upload some documents', { id: toastId });
+            Toast.error(uploadErr.message || 'Failed to upload some documents', { id: toastId });
             return false; // Stop progression if upload fails
           }
         }
         return true;
       } catch (error) {
-        toast.error(error.message || 'Failed to save Finance & Legal details');
+        Toast.error(error.message || 'Failed to save Finance & Legal details');
         return false;
       }
     }
@@ -201,13 +208,13 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
     if (!file) return;
     
     if (file.size > 15 * 1024 * 1024) {
-      toast.error('File size must be less than 15MB');
+      Toast.error('File size must be less than 15MB');
       return;
     }
     
     const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
     if (!allowedTypes.includes(file.type)) {
-      toast.error('Only PDF, PNG, JPG, and JPEG files are allowed');
+      Toast.error('Only PDF, PNG, JPG, and JPEG files are allowed');
       return;
     }
     
@@ -234,16 +241,16 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
       // Remove from local pending state
       setPendingFiles(prev => prev.filter((_, i) => i !== doc.pendingIndex));
       setPreviewDialog(false);
-      toast.success('Pending document removed');
+      Toast.success('Pending document removed');
     } else {
       // Remove from backend
       try {
         const identifier = doc._id || doc.filename;
         await dispatch(deleteRegistrationDocument({ propertyId, documentId: identifier })).unwrap();
-        toast.success('Document deleted successfully!');
+        Toast.success('Document deleted successfully!');
         setPreviewDialog(false);
       } catch (error) {
-        toast.error(error.message || 'Failed to delete document');
+        Toast.error(error.message || 'Failed to delete document');
       }
     }
   };
@@ -307,18 +314,18 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
               <CompactCardContent>
                 <Grid container spacing={2}>
                   <Grid item size={{ xs:12, sm:6}}>
-                    <ResponsiveTextField  fullWidth label="Account Number" value={financeData.bankDetails.accountNumber} onChange={(e) => handleFinanceChange('bankDetails', 'accountNumber', e.target.value)} required error={!!accountNumberError} />
+                    <ResponsiveTextField  fullWidth label="Account Number" value={financeData.bankDetails.accountNumber} onChangeText={(e) => handleFinanceChange('bankDetails', 'accountNumber', e.target.value)} required error={!!accountNumberError} />
                   </Grid>
                   <Grid item size={{ xs:12, sm:6}}>
-                    <ResponsiveTextField  fullWidth label="Re-enter Account" value={financeData.bankDetails.reenterAccountNumber} onChange={(e) => handleFinanceChange('bankDetails', 'reenterAccountNumber', e.target.value)} required error={!!accountNumberError} helperText={accountNumberError} />
+                    <ResponsiveTextField  fullWidth label="Re-enter Account" value={financeData.bankDetails.reenterAccountNumber} onChangeText={(e) => handleFinanceChange('bankDetails', 'reenterAccountNumber', e.target.value)} required error={!!accountNumberError} helperText={accountNumberError} />
                   </Grid>
                   <Grid item size={{ xs:12, sm:6}}>
-                    <ResponsiveTextField  fullWidth label="IFSC Code" value={financeData.bankDetails.ifscCode} onChange={(e) => handleFinanceChange('bankDetails', 'ifscCode', e.target.value.toUpperCase())} required />
+                    <ResponsiveTextField  fullWidth label="IFSC Code" value={financeData.bankDetails.ifscCode} onChangeText={(e) => handleFinanceChange('bankDetails', 'ifscCode', e.target.value.toUpperCase())} required />
                   </Grid>
                   <Grid item size={{ xs:12, sm:6}}>
                     <ResponsiveFormControl fullWidth required>
                       <InputLabel>Bank Name</InputLabel>
-                      <Select value={financeData.bankDetails.bankName} label="Bank Name" onChange={(e) => handleFinanceChange('bankDetails', 'bankName', e.target.value)}>
+                      <Select value={financeData.bankDetails.bankName} label="Bank Name" onChangeText={(e) => handleFinanceChange('bankDetails', 'bankName', e.target.value)}>
                         <MenuItem value="State Bank of India">State Bank of India</MenuItem>
                         <MenuItem value="HDFC Bank">HDFC Bank</MenuItem>
                         <MenuItem value="ICICI Bank">ICICI Bank</MenuItem>
@@ -336,7 +343,7 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
               <CompactCardContent>
                 <Box display="flex" alignItems="center" gap={2} mb={1}>
                   <FormLabel sx={{ fontSize: '0.875rem' }}>Have GSTIN?</FormLabel>
-                  <RadioGroup row value={financeData.taxDetails.hasGSTIN} onChange={(e) => handleFinanceChange('taxDetails', 'hasGSTIN', e.target.value === 'true')}>
+                  <RadioGroup row value={financeData.taxDetails.hasGSTIN} onChangeText={(e) => handleFinanceChange('taxDetails', 'hasGSTIN', e.target.value === 'true')}>
                     <FormControlLabel value={false} control={<Radio />} label="No" sx={{ '.MuiTypography-root': { fontSize: '0.875rem' } }} />
                     <FormControlLabel value={true} control={<Radio />} label="Yes" sx={{ '.MuiTypography-root': { fontSize: '0.875rem' } }} />
                   </RadioGroup>
@@ -344,23 +351,23 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
 
                 <Grid container spacing={2}>
                   <Grid item size={{ xs:12, sm:6}}>
-                    <ResponsiveTextField  fullWidth label="GSTIN" value={financeData.taxDetails.gstin} onChange={(e) => handleFinanceChange('taxDetails', 'gstin', e.target.value.toUpperCase())} disabled={!financeData.taxDetails.hasGSTIN} required={financeData.taxDetails.hasGSTIN} />
+                    <ResponsiveTextField  fullWidth label="GSTIN" value={financeData.taxDetails.gstin} onChangeText={(e) => handleFinanceChange('taxDetails', 'gstin', e.target.value.toUpperCase())} disabled={!financeData.taxDetails.hasGSTIN} required={financeData.taxDetails.hasGSTIN} />
                   </Grid>
                   <Grid item size={{ xs:12, sm:6}}>
-                    <ResponsiveTextField  fullWidth label="PAN" value={financeData.taxDetails.pan} onChange={(e) => handleFinanceChange('taxDetails', 'pan', e.target.value.toUpperCase())} required />
+                    <ResponsiveTextField  fullWidth label="PAN" value={financeData.taxDetails.pan} onChangeText={(e) => handleFinanceChange('taxDetails', 'pan', e.target.value.toUpperCase())} required />
                   </Grid>
                 </Grid>
 
                 <Box display="flex" alignItems="center" gap={2} mt={1} mb={financeData.taxDetails.hasTAN ? 1 : 0}>
                   <FormLabel sx={{ fontSize: '0.875rem' }}>Have TAN?</FormLabel>
-                  <RadioGroup row value={financeData.taxDetails.hasTAN} onChange={(e) => handleFinanceChange('taxDetails', 'hasTAN', e.target.value === 'true')}>
+                  <RadioGroup row value={financeData.taxDetails.hasTAN} onChangeText={(e) => handleFinanceChange('taxDetails', 'hasTAN', e.target.value === 'true')}>
                     <FormControlLabel value={false} control={<Radio />} label="No" sx={{ '.MuiTypography-root': { fontSize: '0.875rem' } }} />
                     <FormControlLabel value={true} control={<Radio />} label="Yes" sx={{ '.MuiTypography-root': { fontSize: '0.875rem' } }} />
                   </RadioGroup>
                 </Box>
 
                 {financeData.taxDetails.hasTAN && (
-                  <ResponsiveTextField  fullWidth label="TAN" value={financeData.taxDetails.tan} onChange={(e) => handleFinanceChange('taxDetails', 'tan', e.target.value.toUpperCase())} required={financeData.taxDetails.hasTAN} />
+                  <ResponsiveTextField  fullWidth label="TAN" value={financeData.taxDetails.tan} onChangeText={(e) => handleFinanceChange('taxDetails', 'tan', e.target.value.toUpperCase())} required={financeData.taxDetails.hasTAN} />
                 )}
               </CompactCardContent>
             </Card>
@@ -381,7 +388,7 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
               <CompactCardContent>
                 <ResponsiveFormControl fullWidth required sx={{ mb: 2 }}>
                   <InputLabel>Ownership Type</InputLabel>
-                  <Select value={legalData.ownershipDetails.ownershipType} label="Ownership Type" onChange={(e) => handleLegalChange('ownershipDetails', 'ownershipType', e.target.value)}>
+                  <Select value={legalData.ownershipDetails.ownershipType} label="Ownership Type" onChangeText={(e) => handleLegalChange('ownershipDetails', 'ownershipType', e.target.value)}>
                     <MenuItem value="My Own property">My Own property</MenuItem>
                     <MenuItem value="Leased property">Leased property</MenuItem>
                     <MenuItem value="Family property">Family property</MenuItem>
@@ -414,7 +421,7 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
                             borderColor: doc.isPending ? 'warning.main' : 'success.main',
                             '&:hover': { transform: 'scale(1.05)', transition: 'all 0.2s' }
                           }}
-                          onClick={() => openPreview(index)}
+                          onPress={() => openPreview(index)}
                         >
                           {doc.originalName?.match(/\.(jpg|jpeg|png)$/i) ? (
                             <CardMedia component="img" image={doc.url} sx={{ height: '100%', objectFit: 'cover' }} />
@@ -432,7 +439,7 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
                           )}
                           <IconButton
                             sx={{ position: 'absolute', top: 2, right: 2, p: 0.2, bgcolor: 'rgba(255,255,255,0.8)' }}
-                            onClick={(e) => { e.stopPropagation(); handleDeleteDocument(doc); }}
+                            onPress={(e) => { e.stopPropagation(); handleDeleteDocument(doc); }}
                           >
                             <DeleteIcon sx={{ fontSize: '1rem' }} color="error" />
                           </IconButton>
@@ -448,7 +455,7 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
                     <Typography variant="body2">Drag & Drop or</Typography>
                     <Button component="label" variant="outlined">
                       Browse
-                      <VisuallyHiddenInput ref={fileInputRef} type="file" accept=".pdf,.png,.jpg,.jpeg" onChange={handleFileSelect} />
+                      <VisuallyHiddenInput ref={fileInputRef} type="file" accept=".pdf,.png,.jpg,.jpeg" onChangeText={handleFileSelect} />
                     </Button>
                   </Box>
                 </UploadArea>
@@ -464,7 +471,7 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
           <Typography variant="subtitle1" noWrap sx={{ maxWidth: '80%' }}>
             {currentDocument?.originalName} {currentDocument?.isPending && '(Pending Upload)'}
           </Typography>
-          <IconButton onClick={() => setPreviewDialog(false)}>
+          <IconButton onPress={() => setPreviewDialog(false)}>
             <CloseIcon />
           </IconButton>
         </DialogTitle>
@@ -472,23 +479,23 @@ const FinanceLegalForm = forwardRef(({ propertyId, onComplete }, ref) => {
           {currentDocument && (
             <>
               {currentDocument.originalName?.match(/\.(jpg|jpeg|png)$/i) ? (
-                <img src={currentDocument.url} alt="Doc" style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                <Image src={currentDocument.url} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
               ) : (
                 <Button variant="contained" href={currentDocument.url} target="_blank">Open PDF</Button>
               )}
-              <IconButton onClick={previousDocument} disabled={selectedDocIndex === 0} sx={{ position: 'absolute', left: 10, color: 'white' }}>
+              <IconButton onPress={previousDocument} disabled={selectedDocIndex === 0} sx={{ position: 'absolute', left: 10, color: 'white' }}>
                 <ArrowBack />
               </IconButton>
-              <IconButton onClick={nextDocument} disabled={selectedDocIndex === allDocuments.length - 1} sx={{ position: 'absolute', right: 10, color: 'white' }}>
+              <IconButton onPress={nextDocument} disabled={selectedDocIndex === allDocuments.length - 1} sx={{ position: 'absolute', right: 10, color: 'white' }}>
                 <ArrowForward />
               </IconButton>
             </>
           )}
         </DialogContent>
         <DialogActions sx={{ p: 2 }}>
-          <Button color="error" onClick={() => currentDocument && handleDeleteDocument(currentDocument)}>Delete</Button>
+          <Button color="error" onPress={() => currentDocument && handleDeleteDocument(currentDocument)}>Delete</Button>
           <Box sx={{ flexGrow: 1 }} />
-          <Button onClick={() => setPreviewDialog(false)}>Close</Button>
+          <Button onPress={() => setPreviewDialog(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </Paper>

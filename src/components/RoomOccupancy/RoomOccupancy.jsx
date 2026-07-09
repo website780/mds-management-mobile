@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 // components/RoomOccupancy/RoomOccupancy.jsx
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
@@ -25,20 +28,20 @@ import {
   Badge,
   Tooltip,
   IconButton,
-} from "@mui/material";
+} from "react-native-paper";
 import {
   Home,
-  Person,
+  User as Person,
   Phone,
-  Email,
-  ConfirmationNumber,
-  CalendarToday,
-  Groups,
-  CleaningServices,
-  HotelOutlined,
-  FilterAlt,
-  FilterAltOff,
-} from "@mui/icons-material";
+  Mail as Email,
+  Ticket as ConfirmationNumber,
+  Calendar as CalendarToday,
+  Users as Groups,
+  Sparkles as CleaningServices, // Standard Lucide proxy for cleaning/cleanliness
+  Building2 as HotelOutlined,
+  Filter as FilterAlt,
+  FilterX as FilterAltOff,
+} from "lucide-react-native";
 import BookingFlow from "../walkinbookings/BookingFlow";
 import {
   checkRoomAvailability,
@@ -264,7 +267,7 @@ const RoomCard = ({ room, guestInfo, loadingGuest, onAddGuest, onRoomDetails, on
             variant="outlined"
             color="primary"
             size="small"
-            onClick={() => onRoomDetails(room)}
+            onPress={() => onRoomDetails(room)}
             sx={{ fontSize: "0.72rem", textTransform: "none", px: 1.5 }}
           >
             View Details
@@ -275,7 +278,7 @@ const RoomCard = ({ room, guestInfo, loadingGuest, onAddGuest, onRoomDetails, on
               variant="contained"
               color="success"
               size="small"
-              onClick={() => onAddGuest(room)}
+              onPress={() => onAddGuest(room)}
               sx={{ fontSize: "0.72rem", textTransform: "none", px: 1.5 }}
             >
               Add Guest
@@ -285,14 +288,14 @@ const RoomCard = ({ room, guestInfo, loadingGuest, onAddGuest, onRoomDetails, on
               variant="text"
               color="warning"
               size="small"
-              onClick={() => onGuestDetails(room)}
+              onPress={() => onGuestDetails(room)}
               sx={{ fontSize: "0.72rem", textTransform: "none", px: 1.5 }}
             >
               Full Details
             </Button>
           ) : (
             <Tooltip title="Under maintenance">
-              <span>
+              <Text>
                 <Button
                   variant="text"
                   color="error"
@@ -303,7 +306,7 @@ const RoomCard = ({ room, guestInfo, loadingGuest, onAddGuest, onRoomDetails, on
                 >
                   Maintenance
                 </Button>
-              </span>
+              </Text>
             </Tooltip>
           )}
         </Stack>
@@ -531,7 +534,7 @@ const RoomOccupancy = ({ property }) => {
           href="/"
           sx={{ display: "flex", alignItems: "center" }}
         >
-          <Home sx={{ mr: 0.5 }} fontSize="inherit" />
+          <Home sx={{ mr: 0.5 }} fontSize="inherit"/>
           Home
         </Link>
         <Typography color="text.primary">Occupancy</Typography>
@@ -554,7 +557,7 @@ const RoomOccupancy = ({ property }) => {
               <Select
                 value={filters.status}
                 label="Status"
-                onChange={(e) => handleFilterChange("status", e.target.value)}
+                onChangeText={(e) => handleFilterChange("status", e.target.value)}
               >
                 <MenuItem value="All">All</MenuItem>
                 <MenuItem value="available">Available</MenuItem>
@@ -570,7 +573,7 @@ const RoomOccupancy = ({ property }) => {
               <Select
                 value={filters.roomType}
                 label="Room Type"
-                onChange={(e) => handleFilterChange("roomType", e.target.value)}
+                onChangeText={(e) => handleFilterChange("roomType", e.target.value)}
               >
                 <MenuItem value="All">All</MenuItem>
                 <MenuItem value="Standard">Standard</MenuItem>
@@ -589,7 +592,7 @@ const RoomOccupancy = ({ property }) => {
               <Select
                 value={filters.bedSize}
                 label="Bed Size"
-                onChange={(e) => handleFilterChange("bedSize", e.target.value)}
+                onChangeText={(e) => handleFilterChange("bedSize", e.target.value)}
               >
                 <MenuItem value="All">All</MenuItem>
                 <MenuItem value="Single Bed">Single Bed</MenuItem>
@@ -605,7 +608,7 @@ const RoomOccupancy = ({ property }) => {
               variant="outlined"
               color="primary"
               fullWidth
-              onClick={handleClearFilters}
+              onPress={handleClearFilters}
               startIcon={<FilterAltOff />}
               sx={{ height: "40px", textTransform: "none" }}
             >
@@ -647,7 +650,7 @@ const RoomOccupancy = ({ property }) => {
           </Typography>
           <Button
             variant="text"
-            onClick={handleClearFilters}
+            onPress={handleClearFilters}
             sx={{ mt: 1, textTransform: "none" }}
           >
             Clear filters

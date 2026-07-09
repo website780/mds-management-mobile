@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 "use client"
 import React from 'react';
 import {
@@ -13,7 +16,7 @@ import {
   Select,
   MenuItem,
   CircularProgress,
-} from '@mui/material';
+} from "react-native-paper";
 
 const EditUserDialog = ({ 
   open, 
@@ -34,7 +37,7 @@ const EditUserDialog = ({
               fullWidth
               label="Name"
               value={editFormData.name}
-              onChange={onInputChange('name')}
+              onChangeText={onInputChange('name')}
             />
           </Grid>
           <Grid item size={{ xs: 12, sm: 6 }}>
@@ -43,7 +46,7 @@ const EditUserDialog = ({
               label="Email"
               type="email"
               value={editFormData.email}
-              onChange={onInputChange('email')}
+              onChangeText={onInputChange('email')}
             />
           </Grid>
           <Grid item size={{ xs: 12, sm: 6 }}>
@@ -51,7 +54,7 @@ const EditUserDialog = ({
               fullWidth
               label="Username"
               value={editFormData.username}
-              onChange={onInputChange('username')}
+              onChangeText={onInputChange('username')}
             />
           </Grid>
           <Grid item size={{ xs: 12, sm: 6 }}>
@@ -60,7 +63,7 @@ const EditUserDialog = ({
               <Select
                 value={editFormData.role}
                 label="Role"
-                onChange={onInputChange('role')}
+                onChangeText={onInputChange('role')}
               >
                 <MenuItem value="guest">Guest</MenuItem>
                 <MenuItem value="admin">Admin</MenuItem>
@@ -74,7 +77,7 @@ const EditUserDialog = ({
               <Select
                 value={editFormData.gender}
                 label="Gender"
-                onChange={onInputChange('gender')}
+                onChangeText={onInputChange('gender')}
               >
                 <MenuItem value="Male">Male</MenuItem>
                 <MenuItem value="Female">Female</MenuItem>
@@ -89,7 +92,7 @@ const EditUserDialog = ({
               label="Date of Birth"
               type="date"
               value={editFormData.dateOfBirth}
-              onChange={onInputChange('dateOfBirth')}
+              onChangeText={onInputChange('dateOfBirth')}
               InputLabelProps={{ shrink: true }}
             />
           </Grid>
@@ -98,7 +101,7 @@ const EditUserDialog = ({
               fullWidth
               label="Phone Number"
               value={editFormData.phoneNumber}
-              onChange={onInputChange('phoneNumber')}
+              onChangeText={onInputChange('phoneNumber')}
             />
           </Grid>
           <Grid item size={{ xs: 12, sm: 6 }}>
@@ -106,7 +109,7 @@ const EditUserDialog = ({
               fullWidth
               label="Marital Status"
               value={editFormData.maritalStatus}
-              onChange={onInputChange('maritalStatus')}
+              onChangeText={onInputChange('maritalStatus')}
             />
           </Grid>
           <Grid item size={{ xs: 12, sm: 6 }}>
@@ -114,7 +117,7 @@ const EditUserDialog = ({
               fullWidth
               label="State"
               value={editFormData.state}
-              onChange={onInputChange('state')}
+              onChangeText={onInputChange('state')}
             />
           </Grid>
           <Grid item size={{ xs: 12, sm: 6 }}>
@@ -122,7 +125,7 @@ const EditUserDialog = ({
               fullWidth
               label="City"
               value={editFormData.city}
-              onChange={onInputChange('city')}
+              onChangeText={onInputChange('city')}
             />
           </Grid>
           <Grid item size={{ xs: 12 }}>
@@ -132,15 +135,15 @@ const EditUserDialog = ({
               multiline
               rows={3}
               value={editFormData.address}
-              onChange={onInputChange('address')}
+              onChangeText={onInputChange('address')}
             />
           </Grid>
         </Grid>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onPress={onClose}>Cancel</Button>
         <Button 
-          onClick={onSubmit} 
+          onPress={onSubmit} 
           variant="contained"
           disabled={isUpdating}
         >

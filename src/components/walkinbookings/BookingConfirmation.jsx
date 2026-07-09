@@ -1,7 +1,17 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 // components/BookingFlow/steps/BookingConfirmation.jsx
 import React from 'react';
-import { Box, Card, CardContent, Typography, Button, Alert, Grid, Divider, Chip, Paper, Stack } from '@mui/material';
-import { CheckCircle, Download, Email, Print, Share, Close } from '@mui/icons-material';
+import { Box, Card, CardContent, Typography, Button, Alert, Grid, Divider, Chip, Paper, Stack } from "react-native-paper";
+import { 
+  CheckCircle2 as CheckCircle, 
+  Download, 
+  Mail as Email, 
+  Printer as Print, 
+  Share2 as Share, // Share2 in Lucide matches the standard Material connected-dots share icon
+  X as Close 
+} from 'lucide-react-native';
 import { format } from 'date-fns';
 
 const BookingConfirmation = ({ booking, property, onClose }) => {
@@ -63,11 +73,11 @@ const BookingConfirmation = ({ booking, property, onClose }) => {
 
       <Stack direction="row" spacing={2} justifyContent="center" flexWrap="wrap" useFlexGap sx={{ mb: 4 }}>
         <Button variant="outlined" startIcon={<Download />} sx={{ minWidth: 150, mb: 1, borderColor: '#1035ac', color: '#1035ac' }}>Download</Button>
-        <Button variant="outlined" startIcon={<Print />} sx={{ minWidth: 150, mb: 1, borderColor: '#1035ac', color: '#1035ac' }} onClick={() => window.print()}>Print</Button>
+        <Button variant="outlined" startIcon={<Print />} sx={{ minWidth: 150, mb: 1, borderColor: '#1035ac', color: '#1035ac' }} onPress={() => window.print()}>Print</Button>
       </Stack>
 
       <Box sx={{ textAlign: 'center' }}>
-        <Button variant="contained" size="large" onClick={onClose} startIcon={<Close />} sx={{ minWidth: 200, bgcolor: '#1035ac', '&:hover': { bgcolor: '#0d2b8a' } }}>Close</Button>
+        <Button variant="contained" size="large" onPress={onClose} startIcon={<Close />} sx={{ minWidth: 200, bgcolor: '#1035ac', '&:hover': { bgcolor: '#0d2b8a' } }}>Close</Button>
       </Box>
     </Box>
   );

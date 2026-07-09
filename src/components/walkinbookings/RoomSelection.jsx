@@ -1,17 +1,29 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 // components/BookingFlow/steps/RoomSelection.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { useDispatch } from 'react-redux';
 import {
   Box, Grid, Card, CardContent, CardMedia, Typography, Button,
   Alert, Chip, CircularProgress, IconButton, Tooltip
-} from '@mui/material';
+} from "react-native-paper";
 import { DatePicker }           from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns }       from '@mui/x-date-pickers/AdapterDateFns';
 import {
-  Person, Bed, Bathtub, CheckCircle, Add, Remove,
-  ShoppingCart, Delete, EventBusy, Warning, Layers
-} from '@mui/icons-material';
+  User as Person, 
+  Bed, 
+  Bath as Bathtub, 
+  CheckCircle2 as CheckCircle, 
+  Plus as Add, 
+  Minus as Remove,
+  ShoppingCart, 
+  Trash2 as Delete, 
+  CalendarX as EventBusy, 
+  AlertTriangle as Warning, 
+  Layers
+} from 'lucide-react-native';
 import { addDays, differenceInDays, format } from 'date-fns';
 import { checkRoomAvailability } from '@/redux/features/rooms/roomSlice';
 
@@ -69,7 +81,7 @@ function CounterRow({ label, sublabel, value, min, max, onChange, accent = false
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <IconButton
           size="small" disabled={value <= min}
-          onClick={() => onChange(Math.max(min, value - 1))}
+          onPress={() => onChange(Math.max(min, value - 1))}
           sx={{ width: 22, height: 22, border: '1px solid', borderColor: accent ? '#f59e0b' : 'divider' }}
         >
           <Remove sx={{ fontSize: 12 }} />
@@ -79,7 +91,7 @@ function CounterRow({ label, sublabel, value, min, max, onChange, accent = false
         </Typography>
         <IconButton
           size="small" disabled={value >= max}
-          onClick={() => onChange(Math.min(max, value + 1))}
+          onPress={() => onChange(Math.min(max, value + 1))}
           sx={{
             width: 22, height: 22, border: '1px solid',
             borderColor: accent ? '#f59e0b' : 'divider',
@@ -119,7 +131,7 @@ function CartItem({ inst, room, onRemove, onGuestChange }) {
           ₹{rate.toLocaleString()}/night · {total} guest{total !== 1 ? 's' : ''}
         </Typography>
         <Tooltip title="Remove">
-          <IconButton size="small" onClick={() => onRemove(inst.cartKey)}
+          <IconButton size="small" onPress={() => onRemove(inst.cartKey)}
             sx={{ color: 'error.main', p: 0.25 }}>
             <Delete sx={{ fontSize: 14 }} />
           </IconButton>
@@ -130,7 +142,7 @@ function CartItem({ inst, room, onRemove, onGuestChange }) {
         label="Adults"
         sublabel={`base ${room.occupancy?.baseAdults || 1}`}
         value={adults} min={1} max={maxAdults}
-        onChange={(v) => onGuestChange(inst.cartKey, 'adults', v)}
+        onChangeText={(v) => onGuestChange(inst.cartKey, 'adults', v)}
       />
 
       {hasGaddi && (
@@ -138,7 +150,7 @@ function CartItem({ inst, room, onRemove, onGuestChange }) {
           label="Floor Mats (Gaddi)"
           sublabel={`₹${room.pricing?.extraFloorBeddingCharge || 0}/mat · ${room.FloorBedding.peoplePerFloorBedding}p/mat`}
           value={extraGaddis} min={0} max={maxGaddis}
-          onChange={(v) => onGuestChange(inst.cartKey, 'extraGaddis', v)}
+          onChangeText={(v) => onGuestChange(inst.cartKey, 'extraGaddis', v)}
           accent
         />
       )}
@@ -315,7 +327,7 @@ function RoomCard({ room, instances, availableUnits, totalUnits, availabilityLoa
                 : <Add sx={{ fontSize: 14 }} />
               }
               disabled={cartFull || availabilityLoading}
-              onClick={() => onAdd(room)}
+              onPress={() => onAdd(room)}
               sx={{
                 mt: 'auto', bgcolor: "#1035ac", color: 'white',
                 '&:hover': { bgcolor: '#0d2b8a' },
@@ -542,7 +554,7 @@ const RoomSelection = ({ property, bookingData, onNext, onDataChange }) => {
               <Grid item xs={12} sm={6}>
                 <DatePicker
                   label="Check-in Date" value={checkIn}
-                  onChange={(v) => { setCheckIn(v); setDateErrors({}); setAvailabilityError(''); }}
+                  onChangeText={(v) => { setCheckIn(v); setDateErrors({}); setAvailabilityError(''); }}
                   minDate={new Date()}
                   slotProps={{ textField: { fullWidth: true, error: !!dateErrors.checkIn, helperText: dateErrors.checkIn } }}
                 />
@@ -550,7 +562,7 @@ const RoomSelection = ({ property, bookingData, onNext, onDataChange }) => {
               <Grid item xs={12} sm={6}>
                 <DatePicker
                   label="Check-out Date" value={checkOut}
-                  onChange={(v) => { setCheckOut(v); setDateErrors({}); setAvailabilityError(''); }}
+                  onChangeText={(v) => { setCheckOut(v); setDateErrors({}); setAvailabilityError(''); }}
                   minDate={checkIn ? addDays(checkIn, 1) : addDays(new Date(), 1)}
                   slotProps={{ textField: { fullWidth: true, error: !!dateErrors.checkOut || !!dateErrors.dates, helperText: dateErrors.checkOut || dateErrors.dates } }}
                 />
@@ -619,7 +631,7 @@ const RoomSelection = ({ property, bookingData, onNext, onDataChange }) => {
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
           <Button
             variant="contained"
-            onClick={handleProceed}
+            onPress={handleProceed}
             disabled={submitting || availabilityLoading || cart.length === 0 || !checkIn || !checkOut}
             startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : null}
             sx={{ bgcolor: BLUE, '&:hover': { bgcolor: '#0d2b8a' }, minWidth: 220, py: 1.25 }}

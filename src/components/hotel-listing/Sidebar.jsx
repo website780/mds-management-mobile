@@ -1,7 +1,12 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Heart, MapPin, Wifi, Car, Utensils, Shield, Droplets } from 'lucide-react-native';
+
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList } from "react-native";
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { X, SlidersHorizontal, Filter } from "lucide-react"
+import { X, SlidersHorizontal, Filter } from "lucide-react-native"
 import { 
   Button, 
   Checkbox, 
@@ -12,7 +17,7 @@ import {
   Chip,
   Divider,
   CircularProgress
-} from "@mui/material"
+} from "react-native-paper"
 import { debounce } from 'lodash';
 
 import { useDispatch, useSelector } from 'react-redux';
@@ -137,14 +142,14 @@ const handleFilterChange = (category, value) => {
   };
 
   const SidebarContent = () => (
-    <div className="space-y-6">
+    <View style={styles.container}>
       {/* Active Filters Count */}
       {getActiveFiltersCount() > 0 && (
-        <div className="bg-linear-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-200">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-blue-600" />
-              <span className="font-semibold text-gray-800">Active Filters</span>
+        <View style={styles.container}>
+          <View style={styles.container}>
+            <View style={styles.container}>
+              <Filter style={styles.container} />
+              <Text style={styles.container}>Active Filters</Text>
               <Chip 
                 label={getActiveFiltersCount()} 
                 size="small"
@@ -155,9 +160,9 @@ const handleFilterChange = (category, value) => {
                   height: '24px'
                 }}
               />
-            </div>
+            </View>
             <Button
-              onClick={clearAllFilters}
+              onPress={clearAllFilters}
               disabled={isSearchLoading}
               sx={{
                 color: '#1035ac',
@@ -177,16 +182,16 @@ const handleFilterChange = (category, value) => {
             >
               Clear All
             </Button>
-          </div>
+          </View>
           
-          <div className="flex flex-wrap gap-2">
+          <View style={styles.container}>
             {Object.entries(localFilters).map(([category, values]) =>
               values.map((value, index) => (
                 <Chip
                   key={`${category}-${index}`}
                   label={value}
                   onDelete={() => handleFilterChange(category, value)}
-                  deleteIcon={<X className="w-3 h-3" />}
+                  deleteIcon={<X style={styles.container} />}
                   disabled={isSearchLoading}
                   sx={{
                     backgroundColor: 'white',
@@ -206,34 +211,34 @@ const handleFilterChange = (category, value) => {
                 />
               ))
             )}
-          </div>
-        </div>
+          </View>
+        </View>
       )}
 
       {/* Loading indicator */}
       {isSearchLoading && (
-        <div className="flex items-center justify-center gap-2 p-3 bg-blue-50 rounded-lg">
+        <View style={styles.container}>
           <CircularProgress size={20} sx={{ color: '#1035ac' }} />
-          <span className="text-sm font-medium text-blue-900">Applying filters...</span>
-        </div>
+          <Text style={styles.container}>Applying filters...</Text>
+        </View>
       )}
 
       {/* Price Range */}
-      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm transition-shadow">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-1 h-5 bg-[#7c3aed]"></div>
+      <View style={styles.container}>
+        <View style={styles.container}>
+          <View style={styles.container}></View>
           <Typography variant="h6" sx={{ fontWeight: 700, color: '#101828', fontFamily: 'serif', fontSize: '1.1rem' }}>
             Price Range
           </Typography>
-        </div>
-        <div className="space-y-3">
+        </View>
+        <View style={styles.container}>
          {priceOptions.map((option) => (
   <FormControlLabel 
     key={option.value}
     control={
       <Checkbox 
         checked={localFilters.priceRange?.includes(option.value) || false}
-        onChange={() => handleFilterChange('priceRange', option.value)}
+        onChangeText={() => handleFilterChange('priceRange', option.value)}
         disabled={isSearchLoading}
         sx={{
           color: '#6b7280',
@@ -255,22 +260,22 @@ const handleFilterChange = (category, value) => {
     }}
   />
 ))}
-        </div>
-      </div>
+        </View>
+      </View>
 
       {/* Star Rating Section Removed */}
 
       {/* <Divider /> */}
 
       {/* Distance from Temple */}
-      {/* <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-1 h-6 bg-linear-to-b from-blue-600 to-purple-600 rounded-full"></div>
+      {/* <View style={styles.container}>
+        <View style={styles.container}>
+          <View style={styles.container}></View>
           <Typography variant="h6" sx={{ fontWeight: 700, color: '#1f2937' }}>
             Distance from Temple
           </Typography>
-        </div>
-        <div className="space-y-2">
+        </View>
+        <View style={styles.container}>
           {[
             { label: "Within 500m", count: getFilterCount('distance', 'Within 500m') },
             { label: "500m - 1km", count: getFilterCount('distance', '500m - 1km') },
@@ -281,7 +286,7 @@ const handleFilterChange = (category, value) => {
               control={
                 <Checkbox 
                   checked={localFilters.distance?.includes(option.label) || false}
-                  onChange={() => handleFilterChange('distance', option.label)}
+                  onChangeText={() => handleFilterChange('distance', option.label)}
                   disabled={isSearchLoading}
                   sx={{
                     color: '#1035ac',
@@ -292,8 +297,8 @@ const handleFilterChange = (category, value) => {
                 />
               } 
               label={
-                <div className="flex items-center justify-between w-full">
-                  <span>{option.label}</span>
+                <View style={styles.container}>
+                  <span>{option.label}</Text>
                   {option.count !== null && (
                     <Chip 
                       label={option.count} 
@@ -306,7 +311,7 @@ const handleFilterChange = (category, value) => {
                       }}
                     />
                   )}
-                </div>
+                </View>
               }
               sx={{
                 width: '100%',
@@ -319,20 +324,20 @@ const handleFilterChange = (category, value) => {
               }}
             />
           ))}
-        </div>
-      </div> */}
+        </View>
+      </View> */}
 
       {/* <Divider /> */}
 
       {/* Amenities */}
-      <div className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm transition-shadow">
-        <div className="flex items-center gap-3 mb-5">
-          <div className="w-1 h-5 bg-[#7c3aed]"></div>
+      <View style={styles.container}>
+        <View style={styles.container}>
+          <View style={styles.container}></View>
           <Typography variant="h6" sx={{ fontWeight: 700, color: '#101828', fontFamily: 'serif', fontSize: '1.1rem' }}>
             Amenities
           </Typography>
-        </div>
-        <div className="flex flex-col space-y-3">
+        </View>
+        <View style={styles.container}>
           {[
             "Wifi", "AC", "Laundry", "Parking", "Room Service", 
             "Smoke Detector", "Restaurant/Bhojnalay", "Elevator/Lift", "Housekeeping",
@@ -343,7 +348,7 @@ const handleFilterChange = (category, value) => {
               control={
                 <Checkbox 
                   checked={localFilters.amenities?.includes(amenity) || false}
-                  onChange={() => handleFilterChange('amenities', amenity)}
+                  onChangeText={() => handleFilterChange('amenities', amenity)}
                   disabled={isSearchLoading}
                   sx={{
                     color: '#1035ac',
@@ -366,9 +371,9 @@ const handleFilterChange = (category, value) => {
               }}
             />
           ))}
-        </div>
-      </div>
-    </div>
+        </View>
+      </View>
+    </View>
   );
 
   if (isMobile) {
@@ -391,14 +396,14 @@ const handleFilterChange = (category, value) => {
             alignItems: 'center',
             borderRadius: '16px 16px 0 0'
           }}>
-            <div className="flex items-center gap-2">
-              <SlidersHorizontal className="w-6 h-6 text-white" />
+            <View style={styles.container}>
+              <SlidersHorizontal style={styles.container} />
               <Typography variant="h6" component="h2" sx={{ fontWeight: 700, color: 'white' }}>
                 Filter Hotels
               </Typography>
-            </div>
+            </View>
             <Button
-              onClick={onCloseModal}
+              onPress={onCloseModal}
               sx={{
                 minWidth: 'auto',
                 color: 'white',
@@ -408,7 +413,7 @@ const handleFilterChange = (category, value) => {
                 }
               }}
             >
-              <X className="w-6 h-6" />
+              <X style={styles.container} />
             </Button>
           </Box>
           
@@ -426,10 +431,10 @@ const handleFilterChange = (category, value) => {
             bottom: 0,
             boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.1)'
           }}>
-            <div className="flex gap-3">
+            <View style={styles.container}>
               <Button
                 variant="outlined"
-                onClick={clearAllFilters}
+                onPress={clearAllFilters}
                 disabled={isSearchLoading}
                 sx={{
                   flex: 1,
@@ -455,7 +460,7 @@ const handleFilterChange = (category, value) => {
               </Button>
               <Button
                 variant="contained"
-                onClick={onCloseModal}
+                onPress={onCloseModal}
                 disabled={isSearchLoading}
                 sx={{
                   flex: 2,
@@ -477,7 +482,7 @@ const handleFilterChange = (category, value) => {
               >
                 {isSearchLoading ? 'Filtering...' : `Close`}
               </Button>
-            </div>
+            </View>
           </Box>
         </Box>
       </Modal>
@@ -485,30 +490,30 @@ const handleFilterChange = (category, value) => {
   }
 
   return (
-   <div className="w-full lg:w-80 bg-white rounded-2xl shadow-lg border border-gray-200 sticky top-24 max-h-[calc(100vh-120px)] flex flex-col">
+   <View style={styles.container}>
     {/* Fixed Header within the Sidebar */}
-    <div className="flex items-center justify-between p-6 pb-4 bg-white rounded-t-2xl">
-      <div className="flex items-center gap-2">
-        <SlidersHorizontal className="w-5 h-5 text-blue-600" />
-        <h3 className="text-xl font-bold text-[#7c3aed] font-serif">
+    <View style={styles.container}>
+      <View style={styles.container}>
+        <SlidersHorizontal style={styles.container} />
+        <Text style={styles.container}>
           Filters
-        </h3>
-      </div>
+        </Text>
+      </View>
       {getActiveFiltersCount() > 0 && (
         <Button 
-          onClick={clearAllFilters}
+          onPress={clearAllFilters}
           disabled={isSearchLoading}
           sx={{ color: '#6b7280', textTransform: 'none', fontSize: '13px' }}
         >
           Clear All
         </Button>
       )}
-    </div>
+    </View>
 
     {/* Scrollable Content Area */}
-    <div className="overflow-y-auto flex-1 p-6 pt-2 custom-scrollbar">
+    <View style={styles.container}>
       <SidebarContent />
-    </div>
-  </div>
+    </View>
+  </View>
   );
 }

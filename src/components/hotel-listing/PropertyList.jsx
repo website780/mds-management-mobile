@@ -1,10 +1,15 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Heart, MapPin, Wifi, Car, Utensils, Shield, Droplets } from 'lucide-react-native';
+
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList } from "react-native";
 "use client";
 
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { PropertyCard } from "./PropertyCard";
-import { Button, Modal, Box, Typography, Radio, RadioGroup, FormControlLabel } from "@mui/material";
-import { TrendingUp, Star, MapPin, IndianRupee } from "lucide-react";
+import { Button, Modal, Box, Typography, Radio, RadioGroup, FormControlLabel } from "react-native-paper";
+import { TrendingUp, Star, MapPin, IndianRupee } from "lucide-react-native";
 
 const sortModalStyle = {
   position: 'absolute',
@@ -68,12 +73,12 @@ export function PropertyList({
   const itemsPerPage = 5;
 
   const sortOptions = [
-    { value: "relevance",   label: "Most Popular",        icon: <TrendingUp className="w-4 h-4" /> },
-    { value: "price-low",   label: "Price (Low to High)", icon: <IndianRupee className="w-4 h-4" /> },
-    { value: "price-high",  label: "Price (High to Low)", icon: <IndianRupee className="w-4 h-4" /> },
-    { value: "rating",      label: "Guest Rating",        icon: <Star className="w-4 h-4" /> },
-    { value: "star-rating", label: "Star Rating",         icon: <Star className="w-4 h-4" /> },
-    { value: "distance",    label: "Distance",            icon: <MapPin className="w-4 h-4" /> },
+    { value: "relevance",   label: "Most Popular",        icon: <TrendingUp style={styles.container} /> },
+    { value: "price-low",   label: "Price (Low to High)", icon: <IndianRupee style={styles.container} /> },
+    { value: "price-high",  label: "Price (High to Low)", icon: <IndianRupee style={styles.container} /> },
+    { value: "rating",      label: "Guest Rating",        icon: <Star style={styles.container} /> },
+    { value: "star-rating", label: "Star Rating",         icon: <Star style={styles.container} /> },
+    { value: "distance",    label: "Distance",            icon: <MapPin style={styles.container} /> },
   ];
 
   const handleSortChange = (value) => {
@@ -113,18 +118,18 @@ export function PropertyList({
 
   if (error) {
     return (
-      <div className="flex-1">
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
-          <div className="text-5xl mb-4">❌</div>
-          <p className="text-red-600 font-semibold text-lg">Error loading properties</p>
-          <p className="text-red-500 text-sm mt-2">{error}</p>
-        </div>
-      </div>
+      <View style={styles.container}>
+        <View style={styles.container}>
+          <View style={styles.container}>❌</View>
+          <Text style={styles.container}>Error loading properties</Text>
+          <Text style={styles.container}>{error}</Text>
+        </View>
+      </View>
     );
   }
 
   return (
-    <div className="flex-1">
+    <View style={styles.container}>
 
       {/* Sort Modal (Mobile) */}
       <Modal
@@ -144,7 +149,7 @@ export function PropertyList({
               Sort Hotels
             </Typography>
             <Button
-              onClick={() => setShowMobileSortModal(false)}
+              onPress={() => setShowMobileSortModal(false)}
               sx={{
                 position: 'absolute', right: 16, top: 16,
                 minWidth: 'auto', color: 'white',
@@ -154,17 +159,17 @@ export function PropertyList({
           </Box>
 
           <Box sx={{ p: 3 }}>
-            <RadioGroup value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
+            <RadioGroup value={sortBy} onChangeText={(e) => handleSortChange(e.target.value)}>
               {sortOptions.map((option) => (
                 <FormControlLabel
                   key={option.value}
                   value={option.value}
                   control={<Radio sx={{ color: '#1035ac', '&.Mui-checked': { color: '#1035ac' } }} />}
                   label={
-                    <div className="flex items-center gap-2">
-                      <span className="text-gray-600">{option.icon}</span>
-                      <span className="font-medium">{option.label}</span>
-                    </div>
+                    <View style={styles.container}>
+                      <Text style={styles.container}>{option.icon}</Text>
+                      <Text style={styles.container}>{option.label}</Text>
+                    </View>
                   }
                   sx={{
                     mb: 1.5, p: 1.5, borderRadius: '12px',
@@ -179,7 +184,7 @@ export function PropertyList({
           <Box sx={{ p: 3, borderTop: '1px solid #e5e7eb' }}>
             <Button
               fullWidth variant="contained"
-              onClick={() => setShowMobileSortModal(false)}
+              onPress={() => setShowMobileSortModal(false)}
               sx={{
                 background: 'linear-gradient(135deg, #1035ac 0%, #7c3aed 100%)',
                 color: 'white', py: 1.5, borderRadius: '12px',
@@ -193,46 +198,46 @@ export function PropertyList({
 
       {/* Initial Loading */}
       {isLoading && properties.length === 0 && (
-        <div className="text-center py-16">
-          <div className="relative inline-block">
-            <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-200 border-t-blue-600 mx-auto"></div>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-2xl">🏨</span>
-            </div>
-          </div>
-          <p className="mt-6 text-gray-600 font-medium text-lg">Finding perfect stays for you...</p>
-          <p className="mt-2 text-gray-400 text-sm">This will just take a moment</p>
-        </div>
+        <View style={styles.container}>
+          <View style={styles.container}>
+            <View style={styles.container}></View>
+            <View style={styles.container}>
+              <Text style={styles.container}>🏨</Text>
+            </View>
+          </View>
+          <Text style={styles.container}>Finding perfect stays for you...</Text>
+          <Text style={styles.container}>This will just take a moment</Text>
+        </View>
       )}
 
       {/* Property Cards — display 5 at a time */}
-      <div className="space-y-6 pb-6 lg:pb-0">
+      <View style={styles.container}>
         {displayedProperties.map((property, index) => (
-          <div
+          <View 
             key={property._id}
-            className="animate-fadeIn"
+            style={styles.container}
             style={{ animationDelay: `${index * 0.05}s` }}
           >
             <PropertyCard {...mapPropertyData(property, parseInt(searchQuery?.rooms) || 1)} />
-          </div>
+          </View>
         ))}
-      </div>
+      </View>
 
       {/* End of list message */}
       {!isLoading && properties.length > 0 && displayedProperties.length === 0 && (
-        <div className="text-center mt-8 pb-4">
-          <p className="text-gray-600 font-medium text-lg">No more properties found</p>
-          <p className="text-gray-400 text-sm mt-1">You have reached the end of the list.</p>
-        </div>
+        <View style={styles.container}>
+          <Text style={styles.container}>No more properties found</Text>
+          <Text style={styles.container}>You have reached the end of the list.</Text>
+        </View>
       )}
 
       {/* Pagination Controls */}
       {properties.length > 0 && (
-        <div className="flex items-center justify-center gap-4 mt-8 pb-24 lg:pb-0">
+        <View style={styles.container}>
           {/* Previous Button */}
           {currentPage > 0 && (
             <Button
-              onClick={handlePrevPage}
+              onPress={handlePrevPage}
               sx={{
                 background: 'white',
                 color: '#1035ac',
@@ -256,7 +261,7 @@ export function PropertyList({
           {/* Next/More Button */}
           {(currentPage + 1 < totalLocalPages || hasMore) && (
             <Button
-              onClick={handleNextPage}
+              onPress={handleNextPage}
               disabled={isLoading}
               sx={{
                 background: 'linear-gradient(135deg, #1035ac 0%, #7c3aed 100%)',
@@ -282,25 +287,25 @@ export function PropertyList({
               {isLoading ? 'Loading...' : 'More properties'}
             </Button>
           )}
-        </div>
+        </View>
       )}
 
       {/* Spinner shown while fetching the next batch */}
       {isLoading && properties.length > 0 && displayedProperties.length === 0 && (
-        <div className="text-center mt-8 pb-24 lg:pb-0">
-          <div className="animate-spin rounded-full h-10 w-10 border-4 border-blue-200 border-t-blue-600 mx-auto"></div>
-          <p className="mt-3 text-gray-500 text-sm">Loading more properties...</p>
-        </div>
+        <View style={styles.container}>
+          <View style={styles.container}></View>
+          <Text style={styles.container}>Loading more properties...</Text>
+        </View>
       )}
 
       {/* No Results */}
       {!isLoading && properties.length === 0 && (
-        <div className="text-center py-16 bg-white rounded-2xl shadow-lg border border-gray-200">
-          <div className="text-7xl mb-6">🔍</div>
-          <h3 className="text-2xl font-bold text-gray-800 mb-3">No Properties Found</h3>
-          <p className="text-gray-600 mb-6 max-w-md mx-auto">
+        <View style={styles.container}>
+          <View style={styles.container}>🔍</View>
+          <Text style={styles.container}>No Properties Found</Text>
+          <Text style={styles.container}>
             We couldn't find any properties matching your search criteria. Try adjusting your filters or search parameters.
-          </p>
+          </Text>
           <Button
             sx={{
               background: 'linear-gradient(135deg, #1035ac 0%, #7c3aed 100%)',
@@ -311,9 +316,9 @@ export function PropertyList({
           >
             Clear Filters
           </Button>
-        </div>
+        </View>
       )}
-    </div>
+    </View>
   );
 }
 

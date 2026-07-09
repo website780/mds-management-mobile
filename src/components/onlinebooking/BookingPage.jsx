@@ -13,9 +13,9 @@ import {
     ChevronUp,
     Layers,
     Users,
-} from "lucide-react";
+} from "lucide-react-native";
 import { useEffect, useMemo, useState } from "react";
-import toast from "react-hot-toast";
+import {toast} from "@backpackapp-io/react-native-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 const nightlyRate = (room, adults, extraGaddis = 0) => {

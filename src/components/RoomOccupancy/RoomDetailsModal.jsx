@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 // components/RoomOccupancy/RoomDetailsModal.jsx
 import React, { useState } from 'react';
 import {
@@ -25,31 +28,31 @@ import {
   Stack,
   useMediaQuery,
   useTheme,
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  Close,
-  Person,
+  X as Close,
+  User as Person,
   Phone,
-  Email,
-  CalendarToday,
+  Mail as Email,
+  Calendar as CalendarToday,
   Bed,
-  Shower,
+  Bath as Shower,
   Wifi,
   Tv,
-  AcUnit,
-  LocalParking,
-  FitnessCenter,
-  Pool,
-  Spa,
-  Business,
-  RoomService,
-  Kitchen,
-  Balcony,
-  PeopleAlt,
-  SquareFoot,
-  AttachMoney,
-  CheckCircle,
-} from '@mui/icons-material';
+  Snowflake as AcUnit,
+  Car as LocalParking,          // Standard proxy for parking
+  Dumbbell as FitnessCenter,
+  Waves as Pool,
+  Flower2 as Spa,               // Commonly used for wellness/spa
+  Briefcase as Business,
+  ConciergeBell as RoomService,
+  Utensils as Kitchen,
+  Sun as Balcony,               // Lucide lacks a direct balcony icon; Sun is a standard proxy for outdoor space
+  Users as PeopleAlt,
+  Ruler as SquareFoot,          // Used for room size/measurement
+  DollarSign as AttachMoney,
+  CheckCircle2 as CheckCircle,  // Matches Material's filled check circle better
+} from 'lucide-react-native';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 
@@ -159,10 +162,9 @@ const RoomDetailsModal = ({
           <Chip
             label={room.status.charAt(0).toUpperCase() + room.status.slice(1)}
             color={getStatusColor(room.status)}
-            size="small"
-          />
+            size="small" />
         </Box>
-        <IconButton onClick={onClose} size="small" sx={{ ml: 1 }}>
+        <IconButton onPress={onClose} size="small" sx={{ ml: 1 }}>
           <Close fontSize="small" />
         </IconButton>
       </DialogTitle>
@@ -171,7 +173,7 @@ const RoomDetailsModal = ({
       <Box sx={{ borderBottom: 1, borderColor: 'divider', px: { xs: 1, sm: 3 } }}>
         <Tabs
           value={selectedTab}
-          onChange={handleTabChange}
+          onChangeText={handleTabChange}
           variant={fullScreen ? 'fullWidth' : 'standard'}
           sx={{
             '& .MuiTab-root': { textTransform: 'none', fontWeight: 500, minWidth: { xs: 0, sm: 90 } },
@@ -314,8 +316,7 @@ const RoomDetailsModal = ({
                           icon={getAmenityIcon(key)}
                           label={key}
                           variant="outlined"
-                          size="small"
-                        />
+                          size="small" />
                       ))}
                     </Box>
                   </CardContent>
@@ -358,16 +359,16 @@ const RoomDetailsModal = ({
                   >
                     <Calendar
                       selectRange
-                      onChange={handleDateChange}
+                      onChangeText={handleDateChange}
                       value={selectedDates}
                       minDate={new Date()}
-                      className="react-calendar"
+                      style={styles.container}
                     />
                   </Box>
                   <Button
                     variant="contained"
                     fullWidth
-                    onClick={handleCheckAvailability}
+                    onPress={handleCheckAvailability}
                     disabled={checking || selectedDates.length !== 2}
                     sx={{
                       mt: 2,
@@ -538,7 +539,7 @@ const RoomDetailsModal = ({
       >
         {room.status === 'available' && (
           <Button
-            onClick={() => onUpdateStatus(room._id, 'maintenance')}
+            onPress={() => onUpdateStatus(room._id, 'maintenance')}
             color="error"
             variant="outlined"
             sx={{ textTransform: 'none', fontWeight: 500 }}
@@ -548,7 +549,7 @@ const RoomDetailsModal = ({
         )}
         {room.status === 'maintenance' && (
           <Button
-            onClick={() => onUpdateStatus(room._id, 'available')}
+            onPress={() => onUpdateStatus(room._id, 'available')}
             color="success"
             variant="outlined"
             sx={{ textTransform: 'none', fontWeight: 500 }}
@@ -557,7 +558,7 @@ const RoomDetailsModal = ({
           </Button>
         )}
         <Button
-          onClick={onClose}
+          onPress={onClose}
           variant="contained"
           sx={{
             bgcolor: BRAND,

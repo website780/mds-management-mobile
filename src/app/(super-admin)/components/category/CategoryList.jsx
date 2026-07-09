@@ -9,9 +9,9 @@ import {
 } from '@/redux/features/blog/blogSlice';
 // import CategoryCard from './CategoryCard';
 import CategoryForm from './CategoryForm';
-import LoadingSpinner from '@/component/common/LoadingSpinner';
-import ErrorMessage from '@/component/common/ErrorMessage';
-import ConfirmDialog from '@/component/common/ConfirmDialog';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import ErrorMessage from '@/components/common/ErrorMessage';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 import Modal from '../ui/Modal';
 import CategoryCard from './CategoryCard';
 

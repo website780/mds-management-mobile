@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 "use client"
 import React from 'react';
 import {
@@ -21,14 +24,14 @@ import {
   Stack,
   useTheme,
   useMediaQuery
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  Person as PersonIcon,
-  Hotel as HotelIcon,
-  Payment as PaymentIcon,
-  CalendarToday as CalendarIcon,
+  User as PersonIcon,
+  Hotel as HotelIcon,        // 'Bed' is also a great alternative for hotel rooms
+  CreditCard as PaymentIcon, // 'Banknote' or 'Wallet' also work well here
+  Calendar as CalendarIcon,
   Download as DownloadIcon
-} from '@mui/icons-material';
+} from 'lucide-react-native';
 
 const BookingModals = ({
   // View Dialog
@@ -384,11 +387,11 @@ const BookingModals = ({
           <Button
             startIcon={<DownloadIcon />}
             variant="outlined"
-            onClick={() => {/* Handle invoice download */}}
+            onPress={() => {/* Handle invoice download */}}
           >
             Download Invoice
           </Button>
-          <Button onClick={() => setViewDialog(false)} variant="contained">
+          <Button onPress={() => setViewDialog(false)} variant="contained">
             Close
           </Button>
         </DialogActions>
@@ -404,7 +407,7 @@ const BookingModals = ({
                 fullWidth
                 label="First Name"
                 value={editForm.primaryGuest?.firstName || ''}
-                onChange={(e) => setEditForm({
+                onChangeText={(e) => setEditForm({
                   ...editForm,
                   primaryGuest: { ...editForm.primaryGuest, firstName: e.target.value }
                 })}
@@ -415,7 +418,7 @@ const BookingModals = ({
                 fullWidth
                 label="Last Name"
                 value={editForm.primaryGuest?.lastName || ''}
-                onChange={(e) => setEditForm({
+                onChangeText={(e) => setEditForm({
                   ...editForm,
                   primaryGuest: { ...editForm.primaryGuest, lastName: e.target.value }
                 })}
@@ -426,7 +429,7 @@ const BookingModals = ({
                 fullWidth
                 label="Email"
                 value={editForm.primaryGuest?.email || ''}
-                onChange={(e) => setEditForm({
+                onChangeText={(e) => setEditForm({
                   ...editForm,
                   primaryGuest: { ...editForm.primaryGuest, email: e.target.value }
                 })}
@@ -437,7 +440,7 @@ const BookingModals = ({
                 fullWidth
                 label="Phone"
                 value={editForm.primaryGuest?.phone || ''}
-                onChange={(e) => setEditForm({
+                onChangeText={(e) => setEditForm({
                   ...editForm,
                   primaryGuest: { ...editForm.primaryGuest, phone: e.target.value }
                 })}
@@ -449,7 +452,7 @@ const BookingModals = ({
                 type="date"
                 label="Check In"
                 value={editForm.checkIn || ''}
-                onChange={(e) => setEditForm({ ...editForm, checkIn: e.target.value })}
+                onChangeText={(e) => setEditForm({ ...editForm, checkIn: e.target.value })}
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -459,7 +462,7 @@ const BookingModals = ({
                 type="date"
                 label="Check Out"
                 value={editForm.checkOut || ''}
-                onChange={(e) => setEditForm({ ...editForm, checkOut: e.target.value })}
+                onChangeText={(e) => setEditForm({ ...editForm, checkOut: e.target.value })}
                 InputLabelProps={{ shrink: true }}
               />
             </Grid>
@@ -474,7 +477,7 @@ const BookingModals = ({
               }}
                 label="Adults"
                 value={editForm.guestCount?.adults || ''}
-                onChange={(e) => setEditForm({
+                onChangeText={(e) => setEditForm({
                   ...editForm,
                   guestCount: { ...editForm.guestCount, adults: parseInt(e.target.value) }
                 })}
@@ -491,7 +494,7 @@ const BookingModals = ({
               }}
                 label="Children"
                 value={editForm.guestCount?.children || ''}
-                onChange={(e) => setEditForm({
+                onChangeText={(e) => setEditForm({
                   ...editForm,
                   guestCount: { ...editForm.guestCount, children: parseInt(e.target.value) }
                 })}
@@ -504,14 +507,14 @@ const BookingModals = ({
                 rows={3}
                 label="Special Requests"
                 value={editForm.specialRequests || ''}
-                onChange={(e) => setEditForm({ ...editForm, specialRequests: e.target.value })}
+                onChangeText={(e) => setEditForm({ ...editForm, specialRequests: e.target.value })}
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setEditDialog(false)}>Cancel</Button>
-          <Button onClick={handleEditSubmit} variant="contained" disabled={isUpdating}>
+          <Button onPress={() => setEditDialog(false)}>Cancel</Button>
+          <Button onPress={handleEditSubmit} variant="contained" disabled={isUpdating}>
             {isUpdating ? 'Updating...' : 'Update'}
           </Button>
         </DialogActions>
@@ -533,7 +536,7 @@ const BookingModals = ({
               }}
                 label="Payment Amount"
                 value={paymentForm.amount}
-                onChange={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
+                onChangeText={(e) => setPaymentForm({ ...paymentForm, amount: e.target.value })}
                 inputProps={{ min: 0 }}
               />
             </Grid>
@@ -543,7 +546,7 @@ const BookingModals = ({
                 <Select
                   value={paymentForm.method}
                   label="Payment Method"
-                  onChange={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })}
+                  onChangeText={(e) => setPaymentForm({ ...paymentForm, method: e.target.value })}
                 >
                   <MenuItem value="cash">Cash</MenuItem>
                   <MenuItem value="card">Card</MenuItem>
@@ -558,14 +561,14 @@ const BookingModals = ({
                 fullWidth
                 label="Transaction ID (Optional)"
                 value={paymentForm.transactionId}
-                onChange={(e) => setPaymentForm({ ...paymentForm, transactionId: e.target.value })}
+                onChangeText={(e) => setPaymentForm({ ...paymentForm, transactionId: e.target.value })}
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setPaymentDialog(false)}>Cancel</Button>
-          <Button onClick={handlePaymentSubmit} variant="contained" disabled={isUpdating}>
+          <Button onPress={() => setPaymentDialog(false)}>Cancel</Button>
+          <Button onPress={handlePaymentSubmit} variant="contained" disabled={isUpdating}>
             {isUpdating ? 'Updating...' : 'Update Payment'}
           </Button>
         </DialogActions>
@@ -583,7 +586,7 @@ const BookingModals = ({
                 rows={3}
                 label="Cancellation Reason"
                 value={cancelForm.reason}
-                onChange={(e) => setCancelForm({ ...cancelForm, reason: e.target.value })}
+                onChangeText={(e) => setCancelForm({ ...cancelForm, reason: e.target.value })}
                 required
               />
             </Grid>
@@ -598,15 +601,15 @@ const BookingModals = ({
               }}
                 label="Refund Amount"
                 value={cancelForm.refundAmount}
-                onChange={(e) => setCancelForm({ ...cancelForm, refundAmount: e.target.value })}
+                onChangeText={(e) => setCancelForm({ ...cancelForm, refundAmount: e.target.value })}
                 inputProps={{ min: 0 }}
               />
             </Grid>
           </Grid>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setCancelDialog(false)}>Cancel</Button>
-          <Button onClick={handleCancelSubmit} variant="contained" color="error" disabled={isUpdating}>
+          <Button onPress={() => setCancelDialog(false)}>Cancel</Button>
+          <Button onPress={handleCancelSubmit} variant="contained" color="error" disabled={isUpdating}>
             {isUpdating ? 'Cancelling...' : 'Cancel Booking'}
           </Button>
         </DialogActions>
