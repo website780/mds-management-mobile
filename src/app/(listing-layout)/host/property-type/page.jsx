@@ -1,7 +1,7 @@
 "use client";
 import Image from "expo-image";
 import Link, { useRouter } from "expo-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react-native";
 import { useState } from "react";
 
 export default function PropertyTypeSelection() {

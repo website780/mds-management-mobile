@@ -1,8 +1,11 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 import { useState, useCallback } from 'react';
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   DialogContentText, Button
-} from '@mui/material';
+} from "react-native-paper";
 
 export const useConfirm = () => {
   const [state, setState] = useState({
@@ -48,10 +51,10 @@ export const useConfirm = () => {
       )}
 
       <DialogActions sx={{ px: 3, pb: 2, gap: 1 }}>
-        <Button onClick={handleCancel} variant="outlined">
+        <Button onPress={handleCancel} variant="outlined">
           {state.cancelText}
         </Button>
-        <Button onClick={handleConfirm} variant="contained" color={state.confirmColor}>
+        <Button onPress={handleConfirm} variant="contained" color={state.confirmColor}>
           {state.confirmText}
         </Button>
       </DialogActions>

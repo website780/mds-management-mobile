@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 "use client"
 import React from 'react';
 import {
@@ -17,14 +20,14 @@ import {
   CircularProgress,
   useTheme,
   useMediaQuery
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  Close as CloseIcon,
-  Edit as EditIcon,
-  Block as BlockIcon,
-  LockReset as LockResetIcon,
+X as CloseIcon,
+  Pencil as EditIcon,      // 'Edit' also works, but 'Pencil' is the standard Lucide icon
+  Ban as BlockIcon,
+  KeyRound as LockResetIcon,
   Download as DownloadIcon,
-} from '@mui/icons-material';
+} from 'lucide-react-native';
 
 const UserProfileDialog = ({ 
   open, 
@@ -100,12 +103,12 @@ const UserProfileDialog = ({
           <Box display="flex" gap={0.5}>
             <IconButton
               size={isMobile ? 'small' : 'medium'}
-              onClick={() => onEdit(selectedUser._id, selectedUser.name)}
+              onPress={() => onEdit(selectedUser._id, selectedUser.name)}
               sx={{ color: '#1976d2' }}
             >
               <EditIcon fontSize={isMobile ? 'small' : 'medium'} />
             </IconButton>
-            <IconButton size={isMobile ? 'small' : 'medium'} onClick={onClose}>
+            <IconButton size={isMobile ? 'small' : 'medium'} onPress={onClose}>
               <CloseIcon fontSize={isMobile ? 'small' : 'medium'} />
             </IconButton>
           </Box>

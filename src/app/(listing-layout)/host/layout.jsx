@@ -1,6 +1,6 @@
 // layout.jsx
 "use client";
-import AvatarDropdown from "@/component/AvatarDropdown";
+import AvatarDropdown from "@/components/AvatarDropdown";
 import { getAllProperties } from "@/redux/features/property/propertySlice";
 import Image from "expo-image";
 import Link, { usePathname, useRouter } from "expo-router";
@@ -14,7 +14,7 @@ import {
   NotebookText,
   Search,
   X,
-} from "lucide-react";
+} from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 

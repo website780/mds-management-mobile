@@ -1,13 +1,22 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 // components/BookingFlow/steps/BookingReview.jsx
 import React from 'react';
 import {
   Box, Grid, Card, CardContent, Typography, Button,
   Divider, Chip, Alert
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  CalendarToday, Person, Hotel, Payment,
-  LocationOn, Phone, Email, Layers
-} from '@mui/icons-material';
+  Calendar as CalendarToday,
+  User as Person,
+  Bed as Hotel,         // 'Hotel' or 'Bed' both work in Lucide, Bed is often preferred
+  CreditCard as Payment,
+  MapPin as LocationOn,
+  Phone,
+  Mail as Email,
+  Layers
+} from 'lucide-react-native';
 import { format, differenceInDays } from 'date-fns';
 
 const BLUE = '#1035ac';
@@ -291,11 +300,11 @@ const BookingReview = ({ property, bookingData, onNext, onBack, onDataChange }) 
 
       {/* Navigation */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 3 }}>
-        <Button variant="outlined" onClick={onBack} size="large"
+        <Button variant="outlined" onPress={onBack} size="large"
           sx={{ borderColor: BLUE, color: BLUE }}>
           Back
         </Button>
-        <Button variant="contained" onClick={handleConfirm} size="large"
+        <Button variant="contained" onPress={handleConfirm} size="large"
           sx={{ bgcolor: BLUE, '&:hover': { bgcolor: '#0d2b8a' } }}>
           Proceed to Payment
         </Button>

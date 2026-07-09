@@ -1,14 +1,22 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 // components/BookingFlow/steps/PaymentDetails.jsx
 import React, { useState } from 'react';
 import {
   Box, Grid, Card, CardContent, Typography, Button,
   FormControl, FormLabel, RadioGroup, FormControlLabel, Radio,
   TextField, Alert, Divider, CircularProgress, Chip
-} from '@mui/material';
+} from "react-native-paper";
 import {
-  Payment, CreditCard, AccountBalance,
-  Money, QrCode, CheckCircle, HourglassEmpty
-} from '@mui/icons-material';
+  Wallet as Payment, 
+  CreditCard, 
+  Landmark as AccountBalance, // Landmark is the standard Lucide bank/balance building
+  Banknote as Money, 
+  QrCode, 
+  CheckCircle2 as CheckCircle, 
+  Hourglass as HourglassEmpty
+} from 'lucide-react-native';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -89,7 +97,7 @@ const PaymentDetails = ({ bookingData, onBack, onSubmit, isLoading }) => {
                 </FormLabel>
                 <RadioGroup
                   value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
+                  onChangeText={(e) => setPaymentMethod(e.target.value)}
                   sx={{ gap: 1 }}
                 >
                   {PAYMENT_METHODS.map((method) => (
@@ -107,7 +115,7 @@ const PaymentDetails = ({ bookingData, onBack, onSubmit, isLoading }) => {
                         transition: 'all 0.15s',
                         cursor: 'pointer',
                       }}
-                      onClick={() => setPaymentMethod(method.value)}
+                      onPress={() => setPaymentMethod(method.value)}
                     >
                       <FormControlLabel
                         value={method.value}
@@ -120,7 +128,7 @@ const PaymentDetails = ({ bookingData, onBack, onSubmit, isLoading }) => {
                         }
                         sx={{ flex: 1, m: 0 }}
                       />
-                      <Chip label={method.badge} color={method.badgeColor} size="small" variant="outlined" />
+                      <Chip label={method.badge} color={method.badgeColor} size="small" variant="outlined"}} />
                     </Box>
                   ))}
                 </RadioGroup>
@@ -135,7 +143,7 @@ const PaymentDetails = ({ bookingData, onBack, onSubmit, isLoading }) => {
                     type="number"
                     size={fieldSize}
                     value={paidAmount}
-                    onChange={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
+                    onChangeText={(e) => setPaidAmount(parseFloat(e.target.value) || 0)}
                     error={!!errors.paidAmount}
                     helperText={errors.paidAmount}
                     inputProps={{ min: 0, max: totalAmount, step: 1 }}
@@ -144,7 +152,7 @@ const PaymentDetails = ({ bookingData, onBack, onSubmit, isLoading }) => {
                   />
                   <Button
                     variant="outlined"
-                    onClick={() => setPaidAmount(totalAmount)}
+                    onPress={() => setPaidAmount(totalAmount)}
                     size="large"
                     sx={{ borderColor: '#1035ac', color: '#1035ac', height: 56, whiteSpace: 'nowrap' }}
                   >
@@ -170,7 +178,7 @@ const PaymentDetails = ({ bookingData, onBack, onSubmit, isLoading }) => {
                   fullWidth
                   label="Transaction ID *"
                   value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
+                  onChangeText={(e) => setTransactionId(e.target.value)}
                   error={!!errors.transactionId}
                   helperText={errors.transactionId || 'Reference / UTR number from the transaction'}
                   sx={{ mb: 2 }}
@@ -241,14 +249,14 @@ const PaymentDetails = ({ bookingData, onBack, onSubmit, isLoading }) => {
       {/* ── Navigation ── */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', mt: 3, gap: 2 }}>
         <Button
-          variant="outlined" onClick={onBack} size="large"
+          variant="outlined" onPress={onBack} size="large"
           disabled={isLoading}
           sx={{ borderColor: '#1035ac', color: '#1035ac' }}
         >
           Back
         </Button>
         <Button
-          variant="contained" onClick={handleSubmit} size="large"
+          variant="contained" onPress={handleSubmit} size="large"
           disabled={isLoading}
           startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
           sx={{ bgcolor: '#1035ac', '&:hover': { bgcolor: '#0d2b8a' }, minWidth: 180 }}

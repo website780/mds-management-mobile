@@ -1,14 +1,21 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Heart, MapPin, Wifi, Car, Utensils, Shield, Droplets } from 'lucide-react-native';
+
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList } from "react-native";
 "use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { MapPin, Building2, Search } from "lucide-react";
+import { MapPin, Building2, Search } from "lucide-react-native";
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 // Updated imports: Swapped Popover for Popper, Paper, and ClickAwayListener
-import { Popper, Paper, ClickAwayListener, Box, Typography, IconButton, Divider } from '@mui/material';
-import { Add, Remove } from '@mui/icons-material';
+import { Popper, Paper, ClickAwayListener, Box, Typography, IconButton, Divider } from "react-native-paper";
+import { Plus as Add, 
+  Minus as Remove
+} from 'lucide-react-native';
 import { useDebounce } from '@/hooks/useDebounce';
 import {
   fetchSuggestions,
@@ -16,7 +23,7 @@ import {
   getPropertiesByQuery,
   setSearchQuery,
 } from "@/redux/features/property/propertySlice";
-import toast from "react-hot-toast";
+import {toast} from "@backpackapp-io/react-native-toast";
 
 export function SearchBar() {
   const dispatch = useDispatch();
@@ -188,11 +195,11 @@ tomorrow.setHours(0, 0, 0, 0);
     setShowSuggestions(false);
 
     if (!locationQuery.trim()) {
-      toast.error("Please enter a location");
+      Toast.error("Please enter a location");
       return;
     }
     if (!searchParams.checkin || !searchParams.checkout) {
-      toast.error("Please select check-in and check-out dates");
+      Toast.error("Please select check-in and check-out dates");
       return;
     }
 
@@ -224,134 +231,134 @@ tomorrow.setHours(0, 0, 0, 0);
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
-      <div className="bg-white rounded-xl shadow-md border border-gray-200 flex flex-col md:flex-row items-stretch overflow-visible">
+      <View style={styles.container}>
 
         {/* ── Location ────────────────────────────────────────────────────── */}
-        <div className="relative flex-1 min-w-0">
-          <div
-            className="flex flex-col justify-center px-5 py-3 h-full cursor-text"
-            onClick={() => locationInputRef.current?.focus()}
+        <View style={styles.container}>
+          <View 
+            style={styles.container}
+            onPress={() => locationInputRef.current?.focus()}
           >
-            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">
+            <Text style={styles.container}>
               City, Area or Property
-            </span>
-            <input
+            </Text>
+            <TextInput 
               ref={locationInputRef}
               type="text"
               placeholder="Enter a destination or property name"
               value={locationQuery}
-              onChange={handleLocationChange}
+              onChangeText={handleLocationChange}
               onFocus={handleLocationFocus}
-              className="text-sm font-semibold text-gray-900 bg-transparent outline-none placeholder-gray-400 w-full disabled:cursor-not-allowed"
+              style={styles.container}
               disabled={isSearchLoading}
             />
-          </div>
+          </View>
 
           {/* ── Suggestions Dropdown ───────────────────────────────────────── */}
           {showSuggestions && (
-            <div
+            <View 
               ref={suggestionsRef}
-              className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-xl p-3 z-50 mt-1 min-w-[300px] max-h-[350px] overflow-y-auto custom-scrollbar"
+              style={styles.container}
             >
               {isSuggestionsLoading ? (
-                <div className="flex items-center justify-center py-4">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
-                </div>
+                <View style={styles.container}>
+                  <View style={styles.container} />
+                </View>
               ) : hasSuggestions ? (
-                <div className="space-y-1">
+                <View style={styles.container}>
 
                   {/* ── Location group ─────────────────────────────────────── */}
                   {locationSuggestions.length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-2 pb-1">
+                    <View>
+                      <Text style={styles.container}>
                         Locations
-                      </p>
+                      </Text>
                       {locationSuggestions.map((suggestion, index) => (
-                        <button
+                        <Pressable 
                           key={`loc-${index}`}
                           type="button"
-                          className="w-full flex items-center gap-3 text-left hover:bg-gray-50 p-2 rounded-lg cursor-pointer transition-colors"
-                          onClick={() => handleSuggestionClick(suggestion)}
+                          style={styles.container}
+                          onPress={() => handleSuggestionClick(suggestion)}
                         >
-                          <div className="shrink-0 w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                            <MapPin className="text-blue-500 w-4 h-4" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-800">
+                          <View style={styles.container}>
+                            <MapPin style={styles.container} />
+                          </View>
+                          <View>
+                            <Text style={styles.container}>
                               {suggestion.city}
-                            </p>
-                            <p className="text-xs text-gray-400">{suggestion.state}</p>
-                          </div>
-                        </button>
+                            </Text>
+                            <Text style={styles.container}>{suggestion.state}</Text>
+                          </View>
+                        </Pressable>
                       ))}
-                    </div>
+                    </View>
                   )}
 
                   {/* Divider between groups */}
                   {locationSuggestions.length > 0 && propertySuggestions.length > 0 && (
-                    <div className="border-t border-gray-100 my-1" />
+                    <View style={styles.container} />
                   )}
 
                   {/* ── Property group ─────────────────────────────────────── */}
                   {propertySuggestions.length > 0 && (
-                    <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-2 pb-1">
+                    <View>
+                      <Text style={styles.container}>
                         Properties
-                      </p>
+                      </Text>
                       {propertySuggestions.map((suggestion, index) => (
-                        <button
+                        <Pressable 
                           key={`prop-${index}`}
                           type="button"
-                          className="w-full flex items-center gap-3 text-left hover:bg-gray-50 p-2 rounded-lg cursor-pointer transition-colors"
-                          onClick={() => handleSuggestionClick(suggestion)}
+                          style={styles.container}
+                          onPress={() => handleSuggestionClick(suggestion)}
                         >
-                          <div className="shrink-0 w-8 h-8 bg-orange-50 rounded-lg flex items-center justify-center">
-                            <Building2 className="text-orange-400 w-4 h-4" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-semibold text-gray-800">
+                          <View style={styles.container}>
+                            <Building2 style={styles.container} />
+                          </View>
+                          <View>
+                            <Text style={styles.container}>
                               {suggestion.placeName}
-                            </p>
-                            <p className="text-xs text-gray-400">
+                            </Text>
+                            <Text style={styles.container}>
                               {suggestion.city}, {suggestion.state}
-                            </p>
-                          </div>
-                        </button>
+                            </Text>
+                          </View>
+                        </Pressable>
                       ))}
-                    </div>
+                    </View>
                   )}
-                </div>
+                </View>
               ) : (
-                <div className="text-gray-500 text-center py-3 text-sm">
+                <View style={styles.container}>
                   No suggestions found
-                </div>
+                </View>
               )}
-            </div>
+            </View>
           )}
-        </div>
+        </View>
 
         {/* Divider */}
-        <div className="hidden md:block w-px bg-gray-200 self-stretch my-3" />
+        <View style={styles.container} />
 
         {/* ── Check-in ────────────────────────────────────────────────────── */}
-        <div className="shrink-0 relative" ref={checkinRef}>
-          <div
-            className="flex flex-col justify-center px-5 py-3 h-full cursor-pointer"
-            onClick={() => !isSearchLoading && setCheckinOpen(true)}
+        <View style={styles.container} ref={checkinRef}>
+          <View 
+            style={styles.container}
+            onPress={() => !isSearchLoading && setCheckinOpen(true)}
           >
-            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">
+            <Text style={styles.container}>
               Check-in
-            </span>
-            <p className={`text-sm font-semibold ${searchParams.checkin ? 'text-gray-900' : 'text-gray-400'}`}>
+            </Text>
+            <Text className={`text-sm font-semibold ${searchParams.checkin ? 'text-gray-900' : 'text-gray-400'}`}>
               {searchParams.checkin ? formatDate(searchParams.checkin) : 'Add date'}
-            </p>
-          </div>
+            </Text>
+          </View>
           <DatePicker
             open={checkinOpen}
             onOpen={() => setCheckinOpen(true)}
             onClose={() => setCheckinOpen(false)}
             value={searchParams.checkin}
-            onChange={(newValue) => {
+            onChangeText={(newValue) => {
               setSearchParams((prev) => ({ ...prev, checkin: newValue }));
               setCheckinOpen(false);
             }}
@@ -366,30 +373,30 @@ tomorrow.setHours(0, 0, 0, 0);
               },
             }}
           />
-        </div>
+        </View>
 
         {/* Divider */}
-        <div className="hidden md:block w-px bg-gray-200 self-stretch my-3" />
+        <View style={styles.container} />
 
         {/* ── Check-out ───────────────────────────────────────────────────── */}
-        <div className="shrink-0 relative" ref={checkoutRef}>
-          <div
-            className="flex flex-col justify-center px-5 py-3 h-full cursor-pointer"
-            onClick={() => !isSearchLoading && setCheckoutOpen(true)}
+        <View style={styles.container} ref={checkoutRef}>
+          <View 
+            style={styles.container}
+            onPress={() => !isSearchLoading && setCheckoutOpen(true)}
           >
-            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">
+            <Text style={styles.container}>
               Check-out
-            </span>
-            <p className={`text-sm font-semibold ${searchParams.checkout ? 'text-gray-900' : 'text-gray-400'}`}>
+            </Text>
+            <Text className={`text-sm font-semibold ${searchParams.checkout ? 'text-gray-900' : 'text-gray-400'}`}>
               {searchParams.checkout ? formatDate(searchParams.checkout) : 'Add date'}
-            </p>
-          </div>
+            </Text>
+          </View>
           <DatePicker
             open={checkoutOpen}
             onOpen={() => setCheckoutOpen(true)}
             onClose={() => setCheckoutOpen(false)}
             value={searchParams.checkout}
-            onChange={(newValue) => {
+            onChangeText={(newValue) => {
               setSearchParams((prev) => ({ ...prev, checkout: newValue }));
               setCheckoutOpen(false);
             }}
@@ -408,59 +415,59 @@ tomorrow.setHours(0, 0, 0, 0);
               },
             }}
           />
-        </div>
+        </View>
 
         {/* Divider */}
-        <div className="hidden md:block w-px bg-gray-200 self-stretch my-3" />
+        <View style={styles.container} />
 
         {/* ── Rooms & Guests ───────────────────────────────────────────────── */}
-        <div className="shrink-0">
-          <button
+        <View style={styles.container}>
+          <Pressable 
             ref={guestsButtonRef}
-            onClick={handleGuestsClick}
+            onPress={handleGuestsClick}
             disabled={isSearchLoading}
-            className="flex flex-col justify-center px-5 py-3 h-full text-left w-full disabled:cursor-not-allowed"
+            style={styles.container}
           >
-            <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-0.5">
+            <Text style={styles.container}>
               Rooms &amp; Guests
-            </span>
+            </Text>
             {isInitialized ? (
-              <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">
+              <Text style={styles.container}>
                 {guests.rooms} Room{guests.rooms !== 1 ? 's' : ''},{' '}
                 {guests.adults} Adult{guests.adults !== 1 ? 's' : ''}
-              </p>
+              </Text>
             ) : (
-              <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">
+              <Text style={styles.container}>
                 1 Room, 2 Adults
-              </p>
+              </Text>
             )}
-          </button>
-        </div>
+          </Pressable>
+        </View>
 
         {/* ── Search Button ───────────────────────────────────────────────── */}
-        <div className="flex items-stretch m-0">
-          <button
-            onClick={handleSearch}
+        <View style={styles.container}>
+          <Pressable 
+            onPress={handleSearch}
             disabled={isSearchLoading}
-            className="flex items-center justify-center gap-2 bg-[#1035ac] hover:bg-[#0e2f99] text-white font-bold uppercase tracking-widest text-sm px-8 rounded-none rounded-r-xl transition disabled:bg-gray-400 disabled:cursor-not-allowed min-w-[120px]"
+            style={styles.container}
           >
             {isSearchLoading ? (
               <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
-                <span>Searching</span>
+                <View style={styles.container} />
+                <Text>Searching</Text>
               </>
             ) : (
               <>
-                <Search className="w-4 h-4" />
-                <span>Search</span>
+                <Search style={styles.container} />
+                <Text>Search</Text>
               </>
             )}
-          </button>
-        </div>
-      </div>
+          </Pressable>
+        </View>
+      </View>
 
       {/* ── Guests Popper (Replaced Popover) ────────────────────────────── */}
-      <div>
+      <View>
         <Popper
           open={isGuestsPopoverOpen}
           anchorEl={guestsAnchorEl}
@@ -484,7 +491,7 @@ tomorrow.setHours(0, 0, 0, 0);
                   </Box>
                   <Box display="flex" alignItems="center" gap={2}>
                     <IconButton
-                      onClick={() => adjustGuests('adults', 'decrease')}
+                      onPress={() => adjustGuests('adults', 'decrease')}
                       disabled={guests.adults <= 1}
                       size="small"
                       sx={{ border: 1, borderColor: 'grey.300', '&:hover': { borderColor: 'grey.500' } }}
@@ -493,7 +500,7 @@ tomorrow.setHours(0, 0, 0, 0);
                     </IconButton>
                     <Typography sx={{ minWidth: 20, textAlign: 'center' }}>{guests.adults}</Typography>
                     <IconButton
-                      onClick={() => adjustGuests('adults', 'increase')}
+                      onPress={() => adjustGuests('adults', 'increase')}
                       size="small"
                       sx={{ border: 1, borderColor: 'grey.300', '&:hover': { borderColor: 'grey.500' } }}
                     >
@@ -512,7 +519,7 @@ tomorrow.setHours(0, 0, 0, 0);
                   </Box>
                   <Box display="flex" alignItems="center" gap={2}>
                     <IconButton
-                      onClick={() => adjustGuests('rooms', 'decrease')}
+                      onPress={() => adjustGuests('rooms', 'decrease')}
                       disabled={guests.rooms <= 1}
                       size="small"
                       sx={{ border: 1, borderColor: 'grey.300', '&:hover': { borderColor: 'grey.500' } }}
@@ -521,7 +528,7 @@ tomorrow.setHours(0, 0, 0, 0);
                     </IconButton>
                     <Typography sx={{ minWidth: 20, textAlign: 'center' }}>{guests.rooms}</Typography>
                     <IconButton
-                      onClick={() => adjustGuests('rooms', 'increase')}
+                      onPress={() => adjustGuests('rooms', 'increase')}
                       size="small"
                       sx={{ border: 1, borderColor: 'grey.300', '&:hover': { borderColor: 'grey.500' } }}
                     >
@@ -533,7 +540,7 @@ tomorrow.setHours(0, 0, 0, 0);
             </Paper>
           </ClickAwayListener>
         </Popper>
-      </div>
+      </View>
     </LocalizationProvider>
   );
 }

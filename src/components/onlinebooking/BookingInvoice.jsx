@@ -2,7 +2,7 @@
 "use client"
 import { useRef, useState } from "react"
 import logo from "../../../public/mds.svg";
-import toast from "react-hot-toast";
+import {toast} from "@backpackapp-io/react-native-toast";
 
 export default function BookingInvoice({ booking, onClose }) {
   const invoiceRef = useRef()

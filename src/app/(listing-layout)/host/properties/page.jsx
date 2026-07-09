@@ -9,9 +9,9 @@ import {
     togglePropertyActive,
 } from "@/redux/features/property/propertySlice";
 import Link, { useRouter } from "expo-router";
-import { Check, Edit, Plus, Search, Trash2, X } from "lucide-react";
+import { Check, Edit, Plus, Search, Trash2, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import {toast} from "@backpackapp-io/react-native-toast";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function Listing() {

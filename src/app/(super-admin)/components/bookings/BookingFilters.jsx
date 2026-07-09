@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 import React, { useState } from 'react';
 import { 
   Card, 
@@ -11,15 +14,15 @@ import {
   Button, 
   Box,
   Typography 
-} from '@mui/material';
+} from "react-native-paper";
 import { 
   Search as SearchIcon, 
-  Add as AddIcon,
-  FileDownload as ExportIcon
-} from '@mui/icons-material';
+  Plus as AddIcon,
+  Download as ExportIcon
+} from 'lucide-react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateFilters, resetFilters } from '@/redux/features/bookings/bookingSlice';
-import toast from 'react-hot-toast';
+import {toast} from "@backpackapp-io/react-native-toast";
 
 const BookingFilters = ({ selectedProperty, bookings }) => {
   const dispatch = useDispatch();
@@ -59,7 +62,7 @@ const BookingFilters = ({ selectedProperty, bookings }) => {
 
   const handleExportCSV = () => {
     if (!bookings || bookings.length === 0) {
-      toast.error("No data available to export");
+      Toast.error("No data available to export");
       return;
     }
 
@@ -110,7 +113,7 @@ const BookingFilters = ({ selectedProperty, bookings }) => {
                 fullWidth
                 placeholder="Search by ID, Name..."
                 value={searchFilters.guestName}
-                onChange={(e) => handleFilterChange('guestName', e.target.value)}
+                onChangeText={(e) => handleFilterChange('guestName', e.target.value)}
                 InputProps={{
                   startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} />
                 }}
@@ -123,7 +126,7 @@ const BookingFilters = ({ selectedProperty, bookings }) => {
                 <Select
                   value={searchFilters.status}
                   label="All Status"
-                  onChange={(e) => handleFilterChange('status', e.target.value)}
+                  onChangeText={(e) => handleFilterChange('status', e.target.value)}
                 >
                   <MenuItem value="">All Status</MenuItem>
                   <MenuItem value="confirmed">Confirmed</MenuItem>
@@ -141,7 +144,7 @@ const BookingFilters = ({ selectedProperty, bookings }) => {
                 <Select
                   value={searchFilters.paymentStatus}
                   label="All Payments"
-                  onChange={(e) => handleFilterChange('paymentStatus', e.target.value)}
+                  onChangeText={(e) => handleFilterChange('paymentStatus', e.target.value)}
                 >
                   <MenuItem value="">All Payments</MenuItem>
                   <MenuItem value="completed">Paid</MenuItem>
@@ -177,7 +180,7 @@ const BookingFilters = ({ selectedProperty, bookings }) => {
                   startIcon={<ExportIcon />}
                   fullWidth
                   sx={{ textTransform: 'none' }}
-                  onClick={handleExportCSV}
+                  onPress={handleExportCSV}
                 >
                   Export CSV
                 </Button>

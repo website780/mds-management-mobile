@@ -1,9 +1,12 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 import { 
   TextField, Grid, Typography, Box, FormControl, InputLabel, Select, MenuItem, FormHelperText
-} from '@mui/material';
+} from "react-native-paper";
 import { useEffect, useState, useRef } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import toast from 'react-hot-toast';
+import {toast} from "@backpackapp-io/react-native-toast";
 import ResponsiveTextField from '../ResponsiveTextField';
 import ResponsiveFormControl from '../ResponsiveFormControl';
 
@@ -123,7 +126,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
 
   const getCurrentLocation = () => {
     if (!navigator.geolocation) {
-      toast.error('Geolocation is not supported by this browser.');
+      Toast.error('Geolocation is not supported by this browser.');
       return;
     }
 
@@ -154,7 +157,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
           case error.TIMEOUT: errorMessage += 'Location request timed out. Please try again.'; break;
           default: errorMessage += 'Please ensure location services are enabled.'; break;
         }
-        toast.error(errorMessage);
+        Toast.error(errorMessage);
       },
       options
     );
@@ -331,7 +334,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 display: 'inline-block',
                 fontWeight: 500
               }}
-              onClick={!isGettingLocation ? getCurrentLocation : undefined}
+              onPress={!isGettingLocation ? getCurrentLocation : undefined}
             >
               {isGettingLocation ? 'Getting Location...' : 'Or Use My Current Location'}
             </Typography>
@@ -364,7 +367,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 fullWidth
                 label="House/Building/Apartment No."
                 value={formData?.houseName || ''}
-                onChange={(e) => onChange('houseName', e.target.value)}
+                onChangeText={(e) => onChange('houseName', e.target.value)}
                 error={!!errors?.houseName}
                 helperText={errors?.houseName}
               />
@@ -377,7 +380,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 fullWidth
                 label="Locality/Area/Street/Sector"
                 value={formData?.street || ''}
-                onChange={(e) => onChange('street', e.target.value)}
+                onChangeText={(e) => onChange('street', e.target.value)}
                 error={!!errors?.street}
                 helperText={errors?.street}
               />
@@ -390,7 +393,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 fullWidth
                 label="Pincode"
                 value={formData?.postalCode || ''}
-                onChange={(e) => onChange('postalCode', e.target.value)}
+                onChangeText={(e) => onChange('postalCode', e.target.value)}
                 error={!!errors?.postalCode}
                 helperText={errors?.postalCode}
               />
@@ -403,7 +406,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 fullWidth
                 label="City"
                 value={formData?.city || ''}
-                onChange={(e) => onChange('city', e.target.value)}
+                onChangeText={(e) => onChange('city', e.target.value)}
                 error={!!errors?.city}
                 helperText={errors?.city}
               />
@@ -415,7 +418,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 <Select
                   value={formData?.state || ''}
                   label="State"
-                  onChange={(e) => onChange('state', e.target.value)}
+                  onChangeText={(e) => onChange('state', e.target.value)}
                 >
                   {indianStates.map((state) => (
                     <MenuItem key={state} value={state}>
@@ -434,7 +437,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 fullWidth
                 label="Country"
                 value={formData?.country || ''}
-                onChange={(e) => onChange('country', e.target.value)}
+                onChangeText={(e) => onChange('country', e.target.value)}
                 error={!!errors?.country}
                 helperText={errors?.country}
               />
@@ -448,7 +451,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 label="Latitude (Optional)"
                 type="number"
                 value={formData?.coordinates?.lat || ''}
-                onChange={(e) => {
+                onChangeText={(e) => {
                   const newLat = parseFloat(e.target.value);
                   onChange('coordinates', { ...formData?.coordinates, lat: isNaN(newLat) ? null : newLat });
                 }}
@@ -463,7 +466,7 @@ export default function LocationForm({ formData, onChange, errors, onSave }) {
                 label="Longitude (Optional)"
                 type="number"
                 value={formData?.coordinates?.lng || ''}
-                onChange={(e) => {
+                onChangeText={(e) => {
                   const newLng = parseFloat(e.target.value);
                   onChange('coordinates', { ...formData?.coordinates, lng: isNaN(newLng) ? null : newLng });
                 }}

@@ -1,3 +1,7 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+import { Heart, MapPin, Wifi, Car, Utensils, Shield, Droplets } from 'lucide-react-native';
+
 import React, { useState } from 'react';
 import {
   Card,
@@ -22,13 +26,13 @@ import {
   useTheme,
   useMediaQuery,
   Divider
-} from '@mui/material';
+} from "react-native-paper";
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   updateFilters,
   clearBookingError 
 } from '@/redux/features/bookings/bookingSlice';
-import { MoreVerticalIcon } from 'lucide-react';
+import { MoreVerticalIcon } from "lucide-react-native";
 
 const BookingTable = ({   
   bookings = [], 
@@ -171,7 +175,7 @@ const BookingTable = ({
         <Pagination
           count={pagination.totalPages || 1}
           page={pagination.currentPage || 1}
-          onChange={handlePageChange}
+          onChangeText={handlePageChange}
           color="primary"
           size={isMobile ? "medium" : "small"}
         />
@@ -197,7 +201,7 @@ const BookingTable = ({
                       {booking.bookingId}
                     </Typography>
                   </Box>
-                  <IconButton size="small" onClick={(e) => handleActionsClick(e, booking)} sx={{ mt: -0.5, mr: -1 }}>
+                  <IconButton size="small" onPress={(e) => handleActionsClick(e, booking)} sx={{ mt: -0.5, mr: -1 }}>
                     <MoreVerticalIcon size={20} />
                   </IconButton>
                 </Box>
@@ -237,7 +241,7 @@ const BookingTable = ({
                       <Chip label={getStatusLabel(booking.status)} color={getStatusColor(booking.status)} size="small" sx={{ fontWeight: 500 }} />
                       <Chip label={getPaymentLabel(booking.payment.status)} color={getPaymentColor(booking.payment.status)} size="small" variant="outlined" sx={{ fontWeight: 500 }} />
                     </Box>
-                    <Typography variant="button" color="primary" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }} onClick={() => onViewBooking && onViewBooking(booking._id)}>
+                    <Typography variant="button" color="primary" sx={{ cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }} onPress={() => onViewBooking && onViewBooking(booking._id)}>
                       VIEW
                     </Typography>
                   </Box>
@@ -306,8 +310,8 @@ const BookingTable = ({
                       </TableCell>
                       <TableCell>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                          <Typography variant="body2" color="primary" sx={{ cursor: 'pointer' }} onClick={() => onViewBooking && onViewBooking(booking._id)}>View</Typography>
-                          <IconButton size="small" onClick={(e) => handleActionsClick(e, booking)}>
+                          <Typography variant="body2" color="primary" sx={{ cursor: 'pointer' }} onPress={() => onViewBooking && onViewBooking(booking._id)}>View</Typography>
+                          <IconButton size="small" onPress={(e) => handleActionsClick(e, booking)}>
                             <MoreVerticalIcon size={20} />
                           </IconButton>
                         </Box>
@@ -330,35 +334,35 @@ const BookingTable = ({
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem onClick={handleViewBooking}>
+        <MenuItem onPress={handleViewBooking}>
           <ListItemText>View Details</ListItemText>
         </MenuItem>
 
         {selectedBooking?.status === 'confirmed' && (
-          <MenuItem onClick={handleCheckIn}>
+          <MenuItem onPress={handleCheckIn}>
             <ListItemText>Check In</ListItemText>
           </MenuItem>
         )}
         {selectedBooking?.status === 'pending' && (
-          <MenuItem onClick={handleConfimStatus}>
+          <MenuItem onPress={handleConfimStatus}>
             <ListItemText>Confirm</ListItemText>
           </MenuItem>  
         )}
         {selectedBooking?.status === 'checked-in' && (
-          <MenuItem onClick={handleCheckOut}>
+          <MenuItem onPress={handleCheckOut}>
             <ListItemText>Check Out</ListItemText>
           </MenuItem>
         )}
         {selectedBooking?.status !== 'cancelled' && selectedBooking?.status !== 'checked-out' && (
-          <MenuItem onClick={handleEditBooking}>
+          <MenuItem onPress={handleEditBooking}>
             <ListItemText>Edit Booking</ListItemText>
           </MenuItem>
         )}
-        <MenuItem onClick={handleUpdatePayment}>
+        <MenuItem onPress={handleUpdatePayment}>
           <ListItemText>Update Payment</ListItemText>
         </MenuItem>
         {selectedBooking?.status !== 'cancelled' && (
-          <MenuItem onClick={handleCancelBooking}>
+          <MenuItem onPress={handleCancelBooking}>
             <ListItemText sx={{ color: 'error.main' }}>Cancel Booking</ListItemText>
           </MenuItem>
         )}

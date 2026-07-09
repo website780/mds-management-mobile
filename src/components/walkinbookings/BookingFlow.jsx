@@ -1,10 +1,13 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 "use client"
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Box, Stepper, Step, StepLabel, Paper, Typography,
   useTheme, useMediaQuery, Fade, Backdrop, CircularProgress
-} from '@mui/material';
+} from "react-native-paper";
 import { createBooking } from '@/redux/features/bookings/bookingSlice';
 import RoomSelection      from './RoomSelection';
 import GuestDetails       from './GuestDetails';

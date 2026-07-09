@@ -1,3 +1,6 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
 // components/BookingDashboard.jsx
 "use client"
 import React, { useState, useEffect } from 'react'
@@ -35,21 +38,21 @@ import {
   CircularProgress,
   Fab,
   Tooltip,
-} from '@mui/material'
+} from "react-native-paper"
 import {
-  Add,
-  MoreVert,
-  Edit,
-  Delete,
-  CheckCircle,
-  ExitToApp,
-  Cancel,
-  Payment,
-  Visibility,
-  FilterList,
-  Refresh,
+  Plus as Add,
+  MoreVertical as MoreVert,
+  Pencil as Edit,
+  Trash2 as Delete,
+  CheckCircle2 as CheckCircle,
+  LogOut as ExitToApp,
+  XCircle as Cancel,
+  CreditCard as Payment,
+  Eye as Visibility,
+  Filter as FilterList,
+  RefreshCw as Refresh,
   Download,
-} from '@mui/icons-material'
+} from 'lucide-react-native';
 import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchAllBookings,

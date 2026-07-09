@@ -1,3 +1,7 @@
+import { View, Text, ScrollView, Image, Pressable, TextInput, FlatList, StyleSheet, Modal } from 'react-native';
+import { useRouter } from 'expo-router';
+
+import { View, Text, Image, Pressable, TextInput, ScrollView, FlatList } from "react-native";
 'use client'
 import React, { useState, useEffect, useRef } from 'react';
 import {
@@ -6,7 +10,7 @@ import {
     Paper, IconButton, Chip, Box, Checkbox, FormControlLabel,
     Card, CardContent, Tabs, Tab, RadioGroup, Radio, FormLabel,
 
-} from '@mui/material';
+} from "react-native-paper";
 
 
 
@@ -14,7 +18,7 @@ import {
 // Tab Panel Component for Room Amenities
 function TabPanel({ children, value, index, ...other }) {
   return (
-    <div
+    <View 
       role="tabpanel"
       hidden={value !== index}
       id={`room-tabpanel-${index}`}
@@ -26,7 +30,7 @@ function TabPanel({ children, value, index, ...other }) {
           {children}
         </Box>
       )}
-    </div>
+    </View>
   );
 }
 
@@ -97,7 +101,7 @@ const renderRoomAmenityOptions = (category, amenity) => {
   return (
     <Grid item xs={12} sm={6} md={4} sx={{ display: 'flex' }}>
       <Box
-        onClick={toggleAmenity}
+        onPress={toggleAmenity}
         sx={{
           width: '100%',
           p: 2,
@@ -130,7 +134,7 @@ const renderRoomAmenityOptions = (category, amenity) => {
 
         {isSelected && (hasOptions || hasSuboptions) && (
           <Box 
-            onClick={(e) => e.stopPropagation()} 
+            onPress={(e) => e.stopPropagation()} 
             sx={{ 
               display: 'flex', 
               flexDirection: 'column', 
@@ -152,7 +156,7 @@ const renderRoomAmenityOptions = (category, amenity) => {
                     return (
                       <Chip 
                         key={opt} label={opt} size="small"
-                        onClick={() => toggleOption(opt)}
+                        onPress={() => toggleOption(opt)}
                         sx={{ 
                           cursor: 'pointer',
                           fontWeight: isOptSelected ? 600 : 400,
@@ -180,7 +184,7 @@ const renderRoomAmenityOptions = (category, amenity) => {
                     return (
                       <Chip 
                         key={sub} label={sub} size="small"
-                        onClick={() => toggleSubOption(sub)}
+                        onPress={() => toggleSubOption(sub)}
                         sx={{ 
                           cursor: 'pointer',
                           fontWeight: isSubSelected ? 600 : 400,
@@ -209,14 +213,14 @@ const renderRoomAmenityOptions = (category, amenity) => {
             
 
             <Typography sx={{ marginTop: "10px"}} variant="subtitle1" gutterBottom>
-                <Divider className="py-5" />
+                <Divider style={styles.container} />
                 </Typography>
                 
             <Box sx={{ marginTop: "10px", width: '100%', bgcolor: 'background.paper' }}>
                 {/* Amenity Category Tabs */}
                 <Tabs
                     value={selectedAmenityTab}
-                    onChange={(event, newValue) => setSelectedAmenityTab(newValue)}
+                    onChangeText={(event, newValue) => setSelectedAmenityTab(newValue)}
                     variant="scrollable"
                     scrollButtons="auto"
                     aria-label="Room amenity categories"
@@ -265,7 +269,7 @@ const renderRoomAmenityOptions = (category, amenity) => {
                                 fullWidth
                                 label={`Custom Amenity ${index + 1}`}
                                 value={currentRoomData?.amenities?.custom?.[index] || ''}
-                                onChange={(e) => {
+                                onChangeText={(e) => {
                                     const newCustom = [...(currentRoomData?.amenities?.custom || ['', ''])];
                                     newCustom[index] = e.target.value;
                                     handleRoomAmenityChange('custom', null, newCustom);

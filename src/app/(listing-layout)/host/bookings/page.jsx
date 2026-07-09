@@ -1,8 +1,8 @@
 // pages/host/bookings/page.jsx
 "use client";
 
-import BookingFlow from "@/component/walkinbookings/BookingFlow";
-import BookingStats from "@/component/walkinbookings/BookingStats";
+import BookingFlow from "@/components/walkinbookings/BookingFlow";
+import BookingStats from "@/components/walkinbookings/BookingStats";
 import {
     fetchAllBookings,
     fetchBookingStats,
@@ -21,7 +21,7 @@ export default function BookingsPage() {
     (state) => state.booking,
   );
 
-  useEffect(() => {
+  useEffect(() => { 
     const saved = localStorage.getItem("selectedProperty");
     if (saved) {
       setSelectedProperty(JSON.parse(saved));
